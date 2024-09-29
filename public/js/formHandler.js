@@ -22,6 +22,7 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
     // Obtener los valores del formulario
     const monto = document.getElementById('monto').value;
     const motivo = document.getElementById('motivo').value;
+    const metodo = document.getElementById('opciones').value;
 
     // Obtener la fecha actual (FechaIngreso) en la zona horaria local
     const fechaActual = new Date();
@@ -36,6 +37,7 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
         Motivo: motivo,
         Monto: parseFloat(monto), // Asegurarse de que sea un número
         FechaIngreso: fechaFormateada,
+        Metodo: metodo
     };
 
     const response = await fetch('/out/ingresos', {

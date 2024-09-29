@@ -8,10 +8,10 @@ const getLastDayOfMonth = (year, month) => {
 // Controlador para manejar la inserción de un nuevo ingreso
 const createIngreso = async (req, res) => {
   try {
-    const { Motivo, Monto, FechaIngreso } = req.body;
+    const { Motivo, Monto, FechaIngreso, Metodo } = req.body;
 
     // Validar que se recibieron los campos requeridos
-    if (!Motivo || !Monto || !FechaIngreso) {
+    if (!Motivo || !Monto || !FechaIngreso || !Metodo) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -40,6 +40,7 @@ const createIngreso = async (req, res) => {
       Monto: parseFloat(Monto), // Asegurarnos que Monto es un número flotante
       FechaIngreso: FechaIngreso, // Usamos la fecha parseada
       FechaPago: fechaPago, // Usamos la fecha de pago calculada
+      Metodo: Metodo
     });
 
     return res.status(201).json(nuevoIngreso);

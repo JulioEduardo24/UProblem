@@ -21,6 +21,15 @@
             <input type="number" name="monto" id="monto" step="0.01" class="input" placeholder="Ingrese el monto" required>
             <label for="motivo">Motivo:</label>
             <input type="text" name="motivo" id="motivo" class="input" placeholder="Motivo del ingreso" required>
+            
+            <!-- Combobox con 3 opciones -->
+            <label for="opciones">Seleccione una opción:</label>
+            <select name="opciones" id="opciones" class="input" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="Tarjeta">Tarjeta</option>
+                <option value="Efectivo">Efectivo</option>
+            </select>
+
             <button type="submit" class="button-confirm">Insertar</button>
         </form>
 

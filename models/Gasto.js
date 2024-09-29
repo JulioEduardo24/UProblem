@@ -19,6 +19,10 @@ const Ingreso = db.define('Ingresos', {
     type: DataTypes.DATE, // Almacena fecha y hora
     allowNull: false,
   },
+  Metodo: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+  },
 }, {
   tableName: 'Ingresos', // Nombre de la tabla en la BD
   timestamps: false, // Si no tienes campos createdAt o updatedAt

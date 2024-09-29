@@ -1,7 +1,6 @@
 
 import User from '../models/Auth.js';
 import bcrypt from 'bcrypt';
-import { verificarSesion } from '../middleware/auth.js';
 
 const formularioLogin = (req, res) => {
     res.render('auth/login')
