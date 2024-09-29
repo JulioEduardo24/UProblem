@@ -38,7 +38,7 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
         FechaIngreso: fechaFormateada,
     };
 
-    const response = await fetch('http://192.168.1.45:3000/out/ingresos', {
+    const response = await fetch('/out/ingresos', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -135,7 +135,7 @@ document.getElementById('logoutButton').addEventListener('click', async function
 
         // Limpiar el localStorage y redirigir al inicio de sesión
         localStorage.removeItem('isLoggedIn');
-        alert(result.message);
+        //alert(result.message);
         window.location.href = '/'; // Redirigir a la página de inicio de sesión
 
     } catch (error) {

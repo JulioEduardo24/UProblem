@@ -72,7 +72,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         // Almacenar una bandera en localStorage indicando que el usuario está logueado
         localStorage.setItem('isLoggedIn', 'true');
         
-        alert('Inicio de sesión exitoso!');
+        //alert('Inicio de sesión exitoso!');
         window.location.href = '/out'; // Redirigir a la página de destino
 
     } catch (error) {
