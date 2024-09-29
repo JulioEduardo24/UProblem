@@ -15,6 +15,11 @@ const createIngreso = async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
+    // Validar que Monto sea un número
+    if (isNaN(Monto)) {
+      return res.status(400).json({ error: 'El campo Monto debe ser un número válido' });
+    }
+
     // Parsear FechaIngreso
     const fechaIngresoDate = new Date(FechaIngreso);
     const diaIngreso = fechaIngresoDate.getDate(); // Obtener el día de la fecha de ingreso
@@ -32,7 +37,7 @@ const createIngreso = async (req, res) => {
     // Crear el nuevo ingreso en la base de datos
     const nuevoIngreso = await Ingreso.create({
       Motivo,
-      Monto,
+      Monto: parseFloat(Monto), // Asegurarnos que Monto es un número flotante
       FechaIngreso: FechaIngreso, // Usamos la fecha parseada
       FechaPago: fechaPago, // Usamos la fecha de pago calculada
     });
