@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Ingresos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <form id="ingresoForm">
+            <h1 style="color: white;">Registrar Ingreso</h1>
+            <label for="monto">Monto:</label>
+            <input type="number" name="monto" id="monto" step="0.01" required>
+            <br>
+            <label for="motivo">Motivo:</label>
+            <input type="text" name="motivo" id="motivo" required>
+            <br>
+            <button type="submit">Agregar Ingreso</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('ingresoForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Evita el envío tradicional del formulario
+            
+            // Obtener los valores del formulario
+            const monto = document.getElementById('monto').value;
+            const motivo = document.getElementById('motivo').value;
+    
+            // Obtener la fecha actual (FechaIngreso) en la zona horaria local
+            const fechaActual = new Date();
+            const year = fechaActual.getFullYear();
+            const month = String(fechaActual.getMonth() + 1).padStart(2, '0'); // +1 porque getMonth() empieza desde 0
+            const day = String(fechaActual.getDate()).padStart(2, '0'); // Asegurarse de que tenga dos dígitos
+    
+            const fechaFormateada = `${year}-${month}-${day}`; // Formato YYYY-MM-DD
+            console.log(fechaFormateada); // Debería devolver la fecha correcta según tu zona horaria
+    
+            // Construir el objeto para enviar al API
+            const datosIngreso = {
+                Motivo: motivo,
+                Monto: parseFloat(monto), // Asegurarse de que sea un número
+                FechaIngreso: fechaFormateada,
+            };
+    
+            try {
+                // Hacer la solicitud POST al API
+                const response = await fetch('http://192.168.1.45:3000/out/ingresos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datosIngreso) // Enviar los datos como JSON
+                });
+    
+                // Manejar la respuesta
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('Ingreso registrado exitosamente');
+                    console.log('Respuesta del servidor:', data);
+                } else {
+                    const errorData = await response.json();
+                    alert('Error al registrar el ingreso: ' + errorData.error);
+                    console.log('Error:', errorData);
+                }
+            } catch (error) {
+                console.error('Error al hacer la solicitud:', error);
+                alert('Error al registrar el ingreso.');
+            }
+        });
+    </script>
+    
+</body>
+
+</html>
