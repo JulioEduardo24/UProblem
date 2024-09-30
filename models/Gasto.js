@@ -23,6 +23,10 @@ const Ingreso = db.define('Ingresos', {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
+  Usuario: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+  },
 }, {
   tableName: 'Ingresos', // Nombre de la tabla en la BD
   timestamps: false, // Si no tienes campos createdAt o updatedAt

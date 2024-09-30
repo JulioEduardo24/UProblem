@@ -2,7 +2,7 @@
 import express from "express";
 const router = express.Router();
 import { verificarSesion } from '../middleware/auth.js';
-import { formularioLogin, Registro, Login } from '../controllers/authController.js'
+import { formularioLogin, Registro, Login, Perfil} from '../controllers/authController.js'
 
 router.get('/', formularioLogin);
 
@@ -18,5 +18,7 @@ router.post('/logout', verificarSesion, (req, res) => {
         res.status(200).json({ message: 'Sesión cerrada exitosamente' });
     });
 });
+
+router.get('/perfil', verificarSesion, Perfil);
 
 export default router

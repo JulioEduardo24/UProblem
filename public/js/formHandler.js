@@ -23,6 +23,9 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
     const monto = document.getElementById('monto').value;
     const motivo = document.getElementById('motivo').value;
     const metodo = document.getElementById('opciones').value;
+    const userEmailElement = document.getElementById('userEmail');
+    const usuario = userEmailElement.textContent;
+    console.log(usuario)
 
     // Obtener la fecha actual (FechaIngreso) en la zona horaria local
     const fechaActual = new Date();
@@ -37,7 +40,8 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
         Motivo: motivo,
         Monto: parseFloat(monto), // Asegurarse de que sea un número
         FechaIngreso: fechaFormateada,
-        Metodo: metodo
+        Metodo: metodo,
+        Usuario: usuario
     };
 
     const response = await fetch('/out/ingresos', {
@@ -140,6 +144,51 @@ document.getElementById('logoutButton').addEventListener('click', async function
         //alert(result.message);
         window.location.href = '/'; // Redirigir a la página de inicio de sesión
 
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+// Obtener el correo del usuario y mostrarlo en el frontend
+async function fetchUserEmail() {
+    try {
+        const response = await fetch('/auth/perfil', {
+            method: 'GET',
+            credentials: 'include' // Incluir la sesión
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Error al obtener el correo');
+        }
+
+        document.getElementById('userEmail').textContent = result.email;
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+fetchUserEmail();
+
+
+// Evento para cerrar sesión
+document.getElementById('logoutButton').addEventListener('click', async function() {
+    try {
+        const response = await fetch('/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Error al cerrar sesión');
+        }
+
+        localStorage.removeItem('isLoggedIn');
+        alert(result.message);
+        window.location.href = 'login.html';
     } catch (error) {
         alert(error.message);
     }
