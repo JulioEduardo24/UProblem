@@ -9,7 +9,7 @@ import { createIngreso } from '../controllers/gastoController.js'
     res.render('index');
 });*/
 router.get('/', verificarSesion, (req, res) => {
-    res.render('index');
+    res.render('/outs/outs');
 });
 router.post('/ingresos', createIngreso);
 
