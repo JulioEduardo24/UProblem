@@ -73,7 +73,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         localStorage.setItem('isLoggedIn', 'true');
         
         //alert('Inicio de sesión exitoso!');
-        window.location.href = '/out'; // Redirigir a la página de destino
+        window.location.href = '/out/'; // Redirigir a la página de destino
 
     } catch (error) {
         errorMessage.textContent = error.message;
