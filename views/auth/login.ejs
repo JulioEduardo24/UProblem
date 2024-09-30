@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/authHandler.js"></script>
 </head>
 <body>
     <div class="container">
@@ -14,10 +15,10 @@
             <input type="email" name="email" id="email" class="input" placeholder="Tu Email" required>
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" class="input" placeholder="Tu Password" required>
+            <a class="link-session" href="/auth/register">¿No tienes cuenta? Registrate!</a>
             <button type="submit" class="button-confirm">Iniciar Sesión</button>
             <div id="errorMessage" class="error"></div>
         </form>
     </div>
-    <script src="/js/authHandler.js"></script>
 </body>
 </html>

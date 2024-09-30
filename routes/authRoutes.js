@@ -2,11 +2,12 @@
 import express from "express";
 const router = express.Router();
 import { verificarSesion } from '../middleware/auth.js';
-import { formularioLogin, Registro, Login, Perfil} from '../controllers/authController.js'
+import { formularioLogin, Registrar, Registro, Login, Perfil} from '../controllers/authController.js'
 
 router.get('/', formularioLogin);
 
 router.post('/login', Login );
+router.get('/register', Registrar);
 router.post('/register', Registro );
 
 // Cierre de sesión

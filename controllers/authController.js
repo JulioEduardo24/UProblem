@@ -6,6 +6,10 @@ const formularioLogin = (req, res) => {
     res.render('auth/login')
 }
 
+const Registrar = (req, res) => {
+    res.render('auth/register')
+}
+
 const Registro = async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -79,5 +83,6 @@ export {
     formularioLogin,
     Registro,
     Login,
-    Perfil
+    Perfil,
+    Registrar
 }

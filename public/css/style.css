@@ -44,7 +44,7 @@ body {
     color: var(--font-color);
     font-weight: 900;
     font-size: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 5px;
     text-align: center; /* Centrar el texto del título */
 }
 
@@ -74,6 +74,7 @@ body {
     font-weight: 600;
     color: var(--font-color);
     cursor: pointer;
+    margin-top: 10px;
 }
 
 .button-confirm:active {
@@ -200,4 +201,18 @@ header {
     font-weight: bold; /* Negrita */
     color: white; /* Color del texto */
     margin-left: 10px;
+}
+
+.link-session {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+.link-session:hover {
+    color: #0056b3; /* Cambia el color del texto al pasar el ratón */
 }
