@@ -130,24 +130,35 @@ document.getElementById('logoutButton').addEventListener('click', async function
     try {
         const response = await fetch('/auth/logout', {
             method: 'POST',
-            credentials: 'include' // Para incluir la sesión
+            credentials: 'include' // Incluir cookies de sesión
         });
 
-        const result = await response.json();
+        // Si la respuesta es un JSON válido
+        if (response.headers.get('content-type').includes('application/json')) {
+            const result = await response.json();
 
-        if (!response.ok) {
-            throw new Error(result.error || 'Error al cerrar sesión');
+            // Manejar el caso de error específico
+            if (!response.ok) {
+                // Redirigir al inicio de sesión sin alertas
+                window.location.href = '/';
+                return;
+            }
+
+            // Si la respuesta es exitosa
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = '/'; // Redirigir a la página de inicio
+        } else {
+            // Si la respuesta no es JSON, redirigir también
+            window.location.href = '/'; // Redirigir a la página de inicio de sesión
         }
-
-        // Limpiar el localStorage y redirigir al inicio de sesión
-        localStorage.removeItem('isLoggedIn');
-        //alert(result.message);
-        window.location.href = '/'; // Redirigir a la página de inicio de sesión
-
+        
     } catch (error) {
-        alert(error.message);
+        // En caso de cualquier error, redirigir sin mostrar alertas
+        window.location.href = '/'; // Redirigir a la página de inicio
     }
 });
+
+
 
 // Obtener el correo del usuario y mostrarlo en el frontend
 async function fetchUserEmail() {
@@ -165,7 +176,8 @@ async function fetchUserEmail() {
 
         document.getElementById('userEmail').textContent = result.email;
     } catch (error) {
-        alert(error.message);
+        console.log("")
+        //alert(error.message);
     }
 }
 
@@ -187,9 +199,13 @@ document.getElementById('logoutButton').addEventListener('click', async function
         }
 
         localStorage.removeItem('isLoggedIn');
-        alert(result.message);
+        console.log("----")
+        console.log(result.message)
+        //alert(result.message);
         window.location.href = 'login.html';
     } catch (error) {
-        alert(error.message);
+        console.log("--")
+        console.log(error.message)
+       //alert(error.message);
     }
 });
