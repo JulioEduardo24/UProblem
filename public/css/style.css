@@ -216,3 +216,38 @@ header {
 .link-session:hover {
     color: #0056b3; /* Cambia el color del texto al pasar el ratón */
 }
+
+
+/* Estilos del header */
+.navbar {
+    background-color: #323439; /* Color negro */
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+.logo-link {
+    color: white;
+    font-size: 1.5rem;
+    text-decoration: none;
+  }
+
+  /* Estilos para el botón de cerrar sesión */
+.logout-button {
+    color: white;
+    text-decoration: none;
+  }
+  .logout-icon {
+    width: 24px;
+    height: 24px;
+  }
+    
