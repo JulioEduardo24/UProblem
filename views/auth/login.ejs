@@ -6,6 +6,13 @@
     <title>Login</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/img/usuario.png" type="image/png">
+    <script>
+      Object.defineProperty(window, 'console', {
+        get: function () {
+          throw new Error('Console is disabled');
+        }
+      });
+    </script>
 </head>
 <body>
     <div class="container">
