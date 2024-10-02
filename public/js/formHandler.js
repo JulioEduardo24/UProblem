@@ -25,7 +25,6 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
     const metodo = document.getElementById('opciones').value;
     const userEmailElement = document.getElementById('userEmail');
     const usuario = userEmailElement.textContent;
-    console.log(usuario)
 
     // Obtener la fecha actual (FechaIngreso) en la zona horaria local
     const fechaActual = new Date();
@@ -91,7 +90,7 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
             successNotification.remove();
         }, 5000); // 5000 ms = 5 segundos
 
-        console.log('Respuesta del servidor:', data);
+        //console.log('Respuesta del servidor:', data);
     } else {
         const errorData = await response.json();
 
@@ -122,7 +121,7 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
             errorNotification.remove();
         }, 5000); // 5000 ms = 5 segundos
 
-        console.log('Error:', errorData);
+        //console.log('Error:', errorData);
     }
 });
 
@@ -176,7 +175,7 @@ async function fetchUserEmail() {
 
         document.getElementById('userEmail').textContent = result.email;
     } catch (error) {
-        console.log("")
+        //console.log("")
         //alert(error.message);
     }
 }
@@ -199,13 +198,9 @@ document.getElementById('logoutButton').addEventListener('click', async function
         }
 
         localStorage.removeItem('isLoggedIn');
-        console.log("----")
-        console.log(result.message)
         //alert(result.message);
         window.location.href = 'login.html';
     } catch (error) {
-        console.log("--")
-        console.log(error.message)
        //alert(error.message);
     }
 });

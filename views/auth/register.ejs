@@ -6,10 +6,17 @@
     <title>Registrarse</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/img/usuario.png" type="image/png">
+    <script>
+      Object.defineProperty(window, 'console', {
+        get: function () {
+          throw new Error('Console is disabled');
+        }
+      });
+    </script>
 </head>
 <body>
     <div class="container">
-        <form id="loginForm" class="form" method="POST">
+        <form id="regisForm" class="form" method="POST">
             <h1 class="title">Registrarse</h1>
             <label for="name">Nombre:</label>
             <input type="text" name="name" id="name" class="input" placeholder="Tu username" required>
@@ -24,7 +31,25 @@
             <button type="submit" class="button-confirm">Registrarse</button>
             <div id="errorMessage" class="error"></div>
         </form>
+        <!-- Loader y notificaciones en el mismo lugar -->
+        <div class="notification-container" id="notificationContainer" style="display: none;">
+            <div class="loader" id="loader" style="display: none;">
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+                <div class="bar4"></div>
+                <div class="bar5"></div>
+                <div class="bar6"></div>
+                <div class="bar7"></div>
+                <div class="bar8"></div>
+                <div class="bar9"></div>
+                <div class="bar10"></div>
+                <div class="bar11"></div>
+                <div class="bar12"></div>
+            </div>
+            <div id="notificationsContainer"></div>
+        </div>
     </div>
-    <!--<script src="/js/authHandler.js"></script>-->
+    <script src="/js/regHandler.js"></script>
 </body>
 </html>

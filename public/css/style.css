@@ -140,6 +140,7 @@ body {
 }
 
 .flex {
+    margin-top: 10px;
     display: flex;
 }
 
@@ -159,6 +160,12 @@ body {
     height: 1.25rem;
 }
 
+.error-svg {
+    color: red;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
 .success-prompt-wrap {
     margin-left: 0.75rem;
 }
@@ -171,6 +178,25 @@ body {
 .success-prompt-prompt {
     margin-top: 0.5rem;
     color: rgb(21 128 61);
+}
+
+.error-prompt {
+    padding: 1rem;
+    border-radius: 0.375rem;
+    background-color: rgb(240 253 244);
+}
+.error-prompt-wrap {
+    margin-left: 0.75rem;
+}
+
+.error-prompt-heading {
+    font-weight: bold;
+    color: red;
+}
+
+.error-prompt-prompt {
+    margin-top: 0.5rem;
+    color: red;
 }
 
 /* Ajustes responsivos */

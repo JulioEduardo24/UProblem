@@ -30,7 +30,7 @@ const Registro = async (req, res) => {
         });
         return res.status(201).json(nuevoUsuario);
     } catch (error) {
-        console.error('Error al registrar el usuario:', error);
+        //console.error('Error al registrar el usuario:', error);
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(400).json({ error: 'El nombre de usuario o el correo ya están en uso.' });
         }

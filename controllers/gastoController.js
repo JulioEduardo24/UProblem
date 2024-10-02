@@ -46,7 +46,7 @@ const createIngreso = async (req, res) => {
 
     return res.status(201).json(nuevoIngreso);
   } catch (error) {
-    console.error('Error al crear el ingreso:', error);
+    //console.error('Error al crear el ingreso:', error);
     return res.status(500).json({ error: 'Error al crear el ingreso' });
   }
 };
