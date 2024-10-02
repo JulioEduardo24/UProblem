@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,26 +8,31 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/img/usuario.png" type="image/png">
     <script>
-      Object.defineProperty(window, 'console', {
-        get: function () {
-          throw new Error('Console is disabled');
-        }
-      });
+        Object.defineProperty(window, 'console', {
+            get: function () {
+                throw new Error('Console is disabled');
+            }
+        });
     </script>
 </head>
+
 <body>
-    <div class="container">
-        <form id="loginForm" class="form" method="POST">
-            <h1 class="title">Iniciar Sesión</h1>
-            <label for="email">Email:</label>
-            <input type="email" name="email" id="email" class="input" placeholder="Tu Email" required>
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password" class="input" placeholder="Tu Password" required>
-            <a class="link-session" href="/auth/register">¿No tienes cuenta? Registrate!</a>
-            <button type="submit" class="button-confirm">Iniciar Sesión</button>
-            <div id="errorMessage" class="error"></div>
-        </form>
+    <div class="containerbg">
+        <div class="container">
+            <form id="loginForm" class="form" method="POST">
+                <h1 class="title">Iniciar Sesión</h1>
+                <label for="email">Email:</label>
+                <input type="email" name="email" id="email" class="input" placeholder="Tu Email" required>
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" class="input" placeholder="Tu Password" required>
+                <a class="link-session" href="/auth/register">¿No tienes cuenta? Registrate!</a>
+                <button type="submit" class="button-confirm">Iniciar Sesión</button>
+                <div id="errorMessage" class="error"></div>
+            </form>
+        </div>
     </div>
+
     <script src="/js/authHandler.js"></script>
 </body>
+
 </html>

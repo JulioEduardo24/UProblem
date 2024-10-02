@@ -17,6 +17,7 @@
 </head>
 
 <body>
+    <div class="containerbg">
     <div class="container">
 
         <header class="navbar">
@@ -44,8 +45,6 @@
                 required>
             <label for="motivo">Motivo:</label>
             <input type="text" name="motivo" id="motivo" class="input" placeholder="Motivo del ingreso" required>
-
-            <!-- Combobox con 3 opciones -->
             <label for="opciones">Seleccione una opción:</label>
             <select name="opciones" id="opciones" class="input" required>
                 <option value="" disabled selected>Seleccione una opción</option>
@@ -75,7 +74,7 @@
             <div id="notificationsContainer"></div>
         </div>
     </div>
-
+</div>
     <!-- Enlace al archivo JavaScript -->
     <script src="/js/formHandler.js"></script>
 
