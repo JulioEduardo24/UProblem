@@ -2,10 +2,9 @@ import Ingreso from '../models/Gasto.js';
 
 // Función para obtener el último día de un mes dado una fecha
 const getLastDayOfMonth = (year, month) => {
-  return new Date(year, month + 1, 0); // Devuelve el último día del mes
+  return new Date(Date.UTC(year, month + 1, 0)); // UTC asegura que estamos trabajando con la fecha correcta sin desviaciones
 }
 
-// Controlador para manejar la inserción de un nuevo ingreso
 const createIngreso = async (req, res) => {
   try {
     const { Motivo, Monto, FechaIngreso, Metodo, Usuario } = req.body;
@@ -22,16 +21,24 @@ const createIngreso = async (req, res) => {
 
     // Parsear FechaIngreso
     const fechaIngresoDate = new Date(FechaIngreso);
-    const diaIngreso = fechaIngresoDate.getDate(); // Obtener el día de la fecha de ingreso
+    const diaIngreso = fechaIngresoDate.getUTCDate(); // Obtener el día de la fecha de ingreso usando UTC
     let fechaPago;
 
     // Si el día es menor o igual a 12, la fecha de pago es el último día del mismo mes
     if (diaIngreso <= 12) {
-      fechaPago = getLastDayOfMonth(fechaIngresoDate.getFullYear(), fechaIngresoDate.getMonth());
+      fechaPago = getLastDayOfMonth(fechaIngresoDate.getUTCFullYear(), fechaIngresoDate.getUTCMonth());
     } else {
       // Si el día es mayor a 12, la fecha de pago es el último día del mes siguiente
-      const siguienteMes = fechaIngresoDate.getMonth() + 1; // Incrementar el mes
-      fechaPago = getLastDayOfMonth(fechaIngresoDate.getFullYear(), siguienteMes);
+      let siguienteMes = fechaIngresoDate.getUTCMonth() + 1; // Incrementar el mes
+
+      // Verificamos si el siguiente mes es enero del próximo año
+      let añoPago = fechaIngresoDate.getUTCFullYear();
+      if (siguienteMes > 11) { // Si es diciembre, pasamos al siguiente año
+        siguienteMes = 0; // El siguiente mes de diciembre es enero (mes 0)
+        añoPago += 1;
+      }
+
+      fechaPago = getLastDayOfMonth(añoPago, siguienteMes);
     }
 
     // Crear el nuevo ingreso en la base de datos
@@ -39,17 +46,18 @@ const createIngreso = async (req, res) => {
       Motivo,
       Monto: parseFloat(Monto), // Asegurarnos que Monto es un número flotante
       FechaIngreso: FechaIngreso, // Usamos la fecha parseada
-      FechaPago: fechaPago, // Usamos la fecha de pago calculada
+      FechaPago: fechaPago, // Usamos la fecha de pago calculada correctamente
       Metodo: Metodo,
       Usuario: Usuario
     });
 
     return res.status(201).json(nuevoIngreso);
   } catch (error) {
-    //console.error('Error al crear el ingreso:', error);
     return res.status(500).json({ error: 'Error al crear el ingreso' });
   }
 };
+
+
 
 export {
   createIngreso

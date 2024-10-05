@@ -8,73 +8,73 @@
     <link rel="icon" href="/img/salida.png" type="image/png">
     <link rel="stylesheet" href="/css/style.css">
     <script>
-      Object.defineProperty(window, 'console', {
-        get: function () {
-          throw new Error('Console is disabled');
-        }
-      });
+        Object.defineProperty(window, 'console', {
+            get: function () {
+                throw new Error('Console is disabled');
+            }
+        });
     </script>
 </head>
 
 <body>
     <div class="containerbg">
-    <div class="container">
+        <div class="container">
 
-        <header class="navbar">
-            <div class="navbar-container">
-                <div class="logo">
-                    <a class="logo-link">UProblem</a>
+            <header class="navbar">
+                <div class="navbar-container">
+                    <div class="logo">
+                        <a class="logo-link">UProblem</a>
+                    </div>
+                    <a id="logoutButton" class="logout-button" title="Cerrar sesión">
+                        <svg class="logout-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 12h4m-4 0l-2-2m2 2l-2 2m-3 4H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v2" />
+                        </svg>
+                    </a>
                 </div>
-                <a id="logoutButton" class="logout-button" title="Cerrar sesión">
-                    <svg class="logout-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 12h4m-4 0l-2-2m2 2l-2 2m-3 4H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v2" />
-                    </svg>
-                </a>
+
+            </header>
+            <!-- Botón de Cerrar Sesión -->
+            <!-- <button id="logoutButton" class="button-confirm" style="margin-bottom: 20px;">Cerrar Sesión</button> -->
+
+            <form id="ingresoForm" class="form">
+                <h1 class="title">Registrar Ingreso</h1>
+                <label for="monto">Monto:</label>
+                <input type="number" name="monto" id="monto" step="0.01" class="input" placeholder="Ingrese el monto"
+                    required>
+                <label for="motivo">Motivo:</label>
+                <input type="text" name="motivo" id="motivo" class="input" placeholder="Motivo del ingreso" required>
+                <label for="opciones">Seleccione una opción:</label>
+                <select name="opciones" id="opciones" class="input" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Efectivo">Efectivo</option>
+                </select>
+                <p id="userEmail" style="margin-left: 10px;">Cargando correo...</p>
+                <button type="submit" class="button-confirm">Insertar</button>
+            </form>
+
+            <!-- Loader y notificaciones en el mismo lugar -->
+            <div class="notification-container" id="notificationContainer" style="display: none;">
+                <div class="loader" id="loader" style="display: none;">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                </div>
+                <div id="notificationsContainer"></div>
             </div>
-
-        </header>
-        <!-- Botón de Cerrar Sesión -->
-        <!-- <button id="logoutButton" class="button-confirm" style="margin-bottom: 20px;">Cerrar Sesión</button> -->
-
-        <form id="ingresoForm" class="form">
-            <h1 class="title">Registrar Ingreso</h1>
-            <label for="monto">Monto:</label>
-            <input type="number" name="monto" id="monto" step="0.01" class="input" placeholder="Ingrese el monto"
-                required>
-            <label for="motivo">Motivo:</label>
-            <input type="text" name="motivo" id="motivo" class="input" placeholder="Motivo del ingreso" required>
-            <label for="opciones">Seleccione una opción:</label>
-            <select name="opciones" id="opciones" class="input" required>
-                <option value="" disabled selected>Seleccione una opción</option>
-                <option value="Tarjeta">Tarjeta</option>
-                <option value="Efectivo">Efectivo</option>
-            </select>
-            <p id="userEmail" style="margin-left: 10px;">Cargando correo...</p>
-            <button type="submit" class="button-confirm">Insertar</button>
-        </form>
-
-        <!-- Loader y notificaciones en el mismo lugar -->
-        <div class="notification-container" id="notificationContainer" style="display: none;">
-            <div class="loader" id="loader" style="display: none;">
-                <div class="bar1"></div>
-                <div class="bar2"></div>
-                <div class="bar3"></div>
-                <div class="bar4"></div>
-                <div class="bar5"></div>
-                <div class="bar6"></div>
-                <div class="bar7"></div>
-                <div class="bar8"></div>
-                <div class="bar9"></div>
-                <div class="bar10"></div>
-                <div class="bar11"></div>
-                <div class="bar12"></div>
-            </div>
-            <div id="notificationsContainer"></div>
         </div>
     </div>
-</div>
     <!-- Enlace al archivo JavaScript -->
     <script src="/js/formHandler.js"></script>
 
