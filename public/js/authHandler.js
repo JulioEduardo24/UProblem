@@ -1,42 +1,35 @@
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
 
-document.getElementById('loginForm').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Evitar el envío del formulario
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMessage = document.getElementById('errorMessage');
+        // Puedes agregar un div con id="errorMessage" en el HTML para mostrar errores
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) errorMessage.textContent = '';
 
-    // Limpiar mensajes de error previos
-    errorMessage.textContent = '';
+        const datos = { email, password };
 
-    // Crear objeto con datos a enviar
-    const datos = {
-        email,
-        password,
-    };
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos),
+            });
 
-    try {
-        const response = await fetch('/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(datos),
-        });
+            const resultado = await response.json();
 
-        const resultado = await response.json();
+            if (!response.ok) {
+                throw new Error(resultado.error || 'Error al iniciar sesión');
+            }
 
-        if (!response.ok) {
-            throw new Error(resultado.error || 'Error al iniciar sesión');
+            localStorage.setItem('isLoggedIn', 'true');
+            window.location.href = '/out/';
+        } catch (error) {
+            if (errorMessage) errorMessage.textContent = error.message;
         }
-
-        // Almacenar una bandera en localStorage indicando que el usuario está logueado
-        localStorage.setItem('isLoggedIn', 'true');
-        
-        //alert('Inicio de sesión exitoso!');
-        window.location.href = '/out/'; // Redirigir a la página de destino
-
-    } catch (error) {
-        errorMessage.textContent = error.message;
-    }
+    });
 });

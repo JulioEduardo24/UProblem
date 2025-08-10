@@ -58,10 +58,9 @@ const Login = async (req, res) => {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
 
-        // Establecer sesión
         req.session.isLoggedIn = true;
         req.session.userId = usuario.id;
-        req.session.userEmail = usuario.email;
+        req.session.username = usuario.username;
         return res.status(200).json({ message: 'Inicio de sesión exitoso' });
     } catch (error) {
         return res.status(500).json({ error: 'Error al iniciar sesión' });
@@ -70,13 +69,13 @@ const Login = async (req, res) => {
 
 
 const Perfil = async (req, res) => {
-    const userEmail = req.session.userEmail;  // Acceder al correo desde la sesión
+    const username = req.session.username; 
 
-    if (!userEmail) {
+    if (!username) {
         return res.status(400).json({ error: 'No se encontró el correo en la sesión' });
     }
 
-    return res.status(200).json({ email: userEmail, message: 'Perfil de usuario' });
+    return res.status(200).json({ email: username, message: 'Perfil de usuario' });
 }
 
 export {

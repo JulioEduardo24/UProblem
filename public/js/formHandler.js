@@ -182,25 +182,25 @@ async function fetchUserEmail() {
 
 fetchUserEmail();
 
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('http://localhost:3000/out/paysMethod')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la petición');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const select = document.getElementById('opciones');
 
-// Evento para cerrar sesión
-document.getElementById('logoutButton').addEventListener('click', async function() {
-    try {
-        const response = await fetch('/auth/logout', {
-            method: 'POST',
-            credentials: 'include'
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.ID;        // Puedes usar item.NOMBRE si prefieres
+                option.textContent = item.NOMBRE;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar las opciones:', error);
         });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.error || 'Error al cerrar sesión');
-        }
-
-        localStorage.removeItem('isLoggedIn');
-        //alert(result.message);
-        window.location.href = 'login.html';
-    } catch (error) {
-       //alert(error.message);
-    }
 });

@@ -1,4 +1,5 @@
 import Ingreso from '../models/Gasto.js';
+import db from '../config/db.js'
 
 // Función para obtener el último día de un mes dado una fecha
 const getLastDayOfMonth = (year, month) => {
@@ -57,8 +58,32 @@ const createIngreso = async (req, res) => {
   }
 };
 
+const getPaysPerMonth = async (req, res) => {
+  try {
+    // Ejecutamos el procedimiento almacenado directamente
+    const results = await db.query('CALL paysPerMonthAct()');
+    
+    // Como los resultados ya vienen agrupados por mes, devolvemos todo el array
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error(error); // Para depurar si algo falla
+    return res.status(500).json({ error: 'Error al obtener los pagos por mes' });
+  }
+};
 
+const getpaysMethod = async (req, res) => {
+  try {
+    // Ejecutamos el procedimiento almacenado directamente
+    const results = await db.query('CALL paysMethod()');
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error(error); // Para depurar si algo falla
+    return res.status(500).json({ error: 'Error al obtener los metodos de pago' });
+  }
+};
 
 export {
-  createIngreso
+  createIngreso,
+  getPaysPerMonth,
+  getpaysMethod
 };
