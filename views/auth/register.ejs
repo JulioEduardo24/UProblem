@@ -2,13 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrarse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/css/styleLog.css">
     <link rel="icon" href="/img/usuario.png" type="image/png">
     <script src="/js/regHandler.js"></script>
 </head>
 <body>
+    <!-- Botón modo claro/oscuro -->
+    <button id="themeToggle" class="theme-toggle">🌙</button>
+
     <div class="containerbg">
         <div class="container">
             <form id="regisForm" class="form" method="POST">
@@ -16,20 +19,16 @@
                     <label>Nombre </label>
                 </div>
                 <div class="inputForm">
-                    <svg
-                    height="60"
-                    viewBox="0 -9 32 32"
-                    width="40"
-                    xmlns="http://www.w3.org/2000/svg"
-                    >
-                    <g id="Layer_3" data-name="Layer 3">
-                        <path
-                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z"
-                        ></path>
-                    </g>
+                    <svg height="60" viewBox="0 -9 32 32" width="40" xmlns="http://www.w3.org/2000/svg">
+                        <g id="Layer_3" data-name="Layer 3">
+                            <path
+                                d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z">
+                            </path>
+                        </g>
                     </svg>
-                    <input name="name" id="name" placeholder="Ingresa tu username" class="input" type="text">
+                    <input name="name" id="name" placeholder="Ingresa tu nombre" class="input" type="text">
                 </div>
+
                 <div class="flex-column">
                     <label>Email </label>
                 </div>
@@ -43,6 +42,7 @@
                     </svg>
                     <input name="email" id="email" placeholder="Ingresa tu Email" class="input" type="email">
                 </div>
+
                 <div class="flex-column">
                     <label>Clave </label>
                 </div>
@@ -58,17 +58,30 @@
                     <input placeholder="Ingresa tu clave" class="input" type="password" name="password" id="password">
                 </div>
 
-                <div class="flex-row">
-                    <div>
-                    </div>
-                    <span class="span">Olvidaste tu clave?</span>
-                </div>
                 <div id="errorMessage" class="error"></div>
                 <button type="submit" class="button-confirm">Registrarse</button>
-                <p class="p">¿Ya tienes cuenta?<a class="span" href="/">¡Inicia Sesión!</a></p>
+                <p class="p">¿Ya tienes cuenta? <a class="span" href="/">¡Inicia Sesión!</a></p>
             </form>
         </div>
     </div>
-    
+
+    <script>
+        // === Alternar modo claro/oscuro ===
+        const toggleBtn = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // Cargar modo guardado
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            toggleBtn.textContent = '☀️';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const darkMode = body.classList.contains('dark-mode');
+            toggleBtn.textContent = darkMode ? '☀️' : '🌙';
+            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+        });
+    </script>
 </body>
 </html>

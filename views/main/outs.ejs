@@ -1,81 +1,184 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingresos</title>
-    <link rel="icon" href="/img/salida.png" type="image/png">
-    <link rel="stylesheet" href="/css/style.css">
-    <script>
-        Object.defineProperty(window, 'console', {
-            get: function () {
-                throw new Error('Console is disabled');
-            }
-        });
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Registrar Ingreso</title>
+  <link rel="icon" href="/img/salida.png" type="image/png" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script>
+    // Deshabilitar consola
+    Object.defineProperty(window, 'console', {
+      get: function () {
+        throw new Error('Console is disabled');
+      }
+    });
+  </script>
 </head>
-
 <body>
-    <div class="containerbg">
-        <div class="container">
-
-            <header class="navbar">
-                <div class="navbar-container">
-                    <div class="logo">
-                        <a class="logo-link">UProblem</a>
-                    </div>
-                    <p id="userEmail">Cargando correo...</p>
-                    <a id="logoutButton" class="logout-button" title="Cerrar sesión">
-                        <svg class="logout-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 12h4m-4 0l-2-2m2 2l-2 2m-3 4H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v2" />
-                        </svg>
-                    </a>
-                </div>
-
-            </header>
-            <!-- Botón de Cerrar Sesión -->
-            <!-- <button id="logoutButton" class="button-confirm" style="margin-bottom: 20px;">Cerrar Sesión</button> -->
-
-            <form id="ingresoForm" class="form">
-                <h1 class="title">Registrar Ingreso</h1>
-                <label for="monto">Monto:</label>
-                <input type="number" name="monto" id="monto" step="0.01" class="input" placeholder="Ingrese el monto"
-                    required>
-                <label for="motivo">Motivo:</label>
-                <input type="text" name="motivo" id="motivo" class="input" placeholder="Motivo del ingreso" required>
-                <label for="opciones">Método de pago:</label>
-                <select name="opciones" id="opciones" class="input" required>
-                    <option value="" disabled selected>Seleccione una opción</option>
-                </select>
-                <button type="submit" class="button-confirm">Insertar</button>
-            </form>
-
-            <!-- Loader y notificaciones en el mismo lugar -->
-            <div class="notification-container" id="notificationContainer" style="display: none;">
-                <div class="loader" id="loader" style="display: none;">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                </div>
-                <div id="notificationsContainer"></div>
-            </div>
+  <header class="navbar">
+    <div class="navbar-container">
+      <div class="logo">
+        <a class="logo-link">UProblem</a>
+      </div>
+      <div class="navbar-actions">
+        <!-- NUEVO BLOQUE DE EMAIL/ID -->
+        <div class="user-info" id="userInfo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="user-icon">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M6 20c0-3 6-5 6-5s6 2 6 5"></path>
+          </svg>
+          <span id="userEmail">Julio</span>
         </div>
+
+
+        <!-- FIN BLOQUE NUEVO -->
+
+        <button id="themeToggle" class="theme-toggle" title="Cambiar tema">🌙</button>
+        <a id="logoutButton" class="logout-button" title="Cerrar sesión">
+          <svg class="logout-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 12h4m-4 0l-2-2m2 2l-2 2m-3 4H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v2" />
+          </svg>
+        </a>
+      </div>
     </div>
-    <!-- Enlace al archivo JavaScript -->
-    <script src="/js/formHandler.js"></script>
+  </header>
 
+  <main class="main-wrapper">
+    <form id="ingresoForm" class="form">
+      <h1 class="title">Registrar Ingreso</h1>
+      <label for="monto">Monto:</label>
+      <input type="number" id="monto" name="monto" class="input" step="0.01" placeholder="Ingrese el monto" required />
+      <label for="motivo">Motivo:</label>
+      <input type="text" id="motivo" name="motivo" class="input" placeholder="Motivo del ingreso" required />
+      <label>Método de pago:</label>
+      
+      <!-- Select Custom -->
+      <div class="custom-select-wrapper">
+        <div class="custom-select" id="customSelect">
+          <div class="custom-select-trigger">
+            <span>Seleccione una opción</span>
+            <svg class="custom-select-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="custom-options">
+            <!-- Las opciones se cargarán aquí dinámicamente -->
+          </div>
+        </div>
+        <input type="hidden" id="opciones" name="opciones" required />
+      </div>
+
+      <button type="submit" class="button-confirm">Insertar</button>
+    </form>
+
+    <div class="notification-container" id="notificationContainer" style="display: none;">
+      <div class="loader" id="loader" style="display: none;">
+        <div class="bar1"></div><div class="bar2"></div><div class="bar3"></div><div class="bar4"></div>
+        <div class="bar5"></div><div class="bar6"></div><div class="bar7"></div><div class="bar8"></div>
+        <div class="bar9"></div><div class="bar10"></div><div class="bar11"></div><div class="bar12"></div>
+      </div>
+      <div id="notificationsContainer"></div>
+    </div>
+  </main>
+
+  <script>
+    // Alternar tema y guardarlo en localStorage
+    const toggleBtn = document.getElementById('themeToggle');
+    const body = document.body;
+
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark-mode');
+      toggleBtn.textContent = '☀️';
+    } else {
+      toggleBtn.textContent = '🌙';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const darkMode = body.classList.contains('dark-mode');
+      toggleBtn.textContent = darkMode ? '☀️' : '🌙';
+      localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    });
+
+    // Custom Select Logic
+    const customSelect = document.getElementById('customSelect');
+    const selectTrigger = customSelect.querySelector('.custom-select-trigger');
+    const optionsContainer = customSelect.querySelector('.custom-options');
+    const hiddenInput = document.getElementById('opciones');
+
+    const opciones = [
+      { value: 'efectivo', text: 'Efectivo' },
+      { value: 'tarjeta', text: 'Tarjeta de crédito' },
+      { value: 'transferencia', text: 'Transferencia bancaria' },
+      { value: 'paypal', text: 'PayPal' },
+    ];
+
+    opciones.forEach(option => {
+      const optionElement = document.createElement('div');
+      optionElement.classList.add('custom-option');
+      optionElement.textContent = option.text;
+      optionElement.dataset.value = option.value;
+      optionsContainer.appendChild(optionElement);
+    });
+
+    selectTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      customSelect.classList.toggle('open');
+    });
+
+    optionsContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('custom-option')) {
+        const selectedValue = e.target.dataset.value;
+        const selectedText = e.target.textContent;
+        selectTrigger.querySelector('span').textContent = selectedText;
+        hiddenInput.value = selectedValue;
+        optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        e.target.classList.add('selected');
+        customSelect.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', () => customSelect.classList.remove('open'));
+    // Mostrar tooltip con el correo/nombre en móviles
+    const userInfo = document.getElementById('userInfo');
+    const userEmailSpan = document.getElementById('userEmail');
+
+    // Crear tooltip dinámico
+    const tooltip = document.createElement('div');
+    tooltip.classList.add('user-tooltip');
+    document.body.appendChild(tooltip);
+
+    let tooltipVisible = false;
+
+    userInfo.addEventListener('click', (e) => {
+      // Solo activar en pantallas pequeñas
+      if (window.innerWidth <= 480) {
+        e.stopPropagation();
+        tooltip.textContent = userEmailSpan.textContent.trim() || "Usuario";
+        
+        const rect = userInfo.getBoundingClientRect();
+        tooltip.style.top = `${rect.bottom + 8}px`;
+        tooltip.style.left = `${rect.right - tooltip.offsetWidth}px`;
+        
+        tooltip.classList.toggle('show');
+        tooltipVisible = !tooltipVisible;
+      }
+    });
+
+    // Cerrar tooltip si se toca fuera
+    document.addEventListener('click', () => {
+      if (tooltipVisible) {
+        tooltip.classList.remove('show');
+        tooltipVisible = false;
+      }
+    });
+
+  </script>
+  <script src="/js/formHandler.js"></script>
 </body>
-
 </html>

@@ -1,23 +1,113 @@
+// ===== FUNCIÓN PARA MOSTRAR NOTIFICACIONES ESTILIZADAS =====
+function showNotification(type, title, message, duration = 5000) {
+  const container = document.getElementById('notificationsContainer');
+  
+  // Crear el elemento de notificación
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  
+  // HTML de la notificación
+  notification.innerHTML = `
+    <div class="notification-icon">
+      ${getIconSVG(type)}
+    </div>
+    <div class="notification-content">
+      <h3 class="notification-title">${title}</h3>
+      <p class="notification-message">${message}</p>
+    </div>
+    <button class="notification-close">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <div class="notification-progress"></div>
+  `;
+  
+  // Añadir al contenedor
+  container.appendChild(notification);
+  
+  // Mostrar el contenedor
+  const notificationContainer = document.getElementById('notificationContainer');
+  notificationContainer.style.display = 'block';
+  
+  // Botón de cerrar
+  const closeBtn = notification.querySelector('.notification-close');
+  closeBtn.addEventListener('click', () => {
+    removeNotification(notification);
+  });
+  
+  // Auto-cerrar después de la duración especificada
+  setTimeout(() => {
+    removeNotification(notification);
+  }, duration);
+}
+
+function removeNotification(notification) {
+  notification.classList.add('removing');
+  setTimeout(() => {
+    notification.remove();
+    
+    // Ocultar el contenedor si no hay más notificaciones
+    const container = document.getElementById('notificationsContainer');
+    if (container.children.length === 0) {
+      document.getElementById('notificationContainer').style.display = 'none';
+    }
+  }, 300);
+}
+
+function getIconSVG(type) {
+  const icons = {
+    success: `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    `,
+    error: `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
+    `,
+    warning: `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    `,
+    info: `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    `
+  };
+  
+  return icons[type] || icons.info;
+}
+
+// ===== VERIFICACIÓN DE SESIÓN =====
 window.onload = function() {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
 
     if (!isLoggedIn) {
-        // Si no hay sesión activa, redirigir al inicio de sesión
         alert('Por favor, inicie sesión para acceder a esta página.');
-        window.location.href = '/'; // Cambia esto a la URL de tu página de inicio de sesión
+        window.location.href = '/';
     }
 };
 
+// ===== MANEJO DEL FORMULARIO =====
 document.getElementById('ingresoForm').addEventListener('submit', async function (event) {
-    event.preventDefault(); // Evita el envío tradicional del formulario
+    event.preventDefault();
 
     // Mostrar el loader
     const loader = document.getElementById('loader');
     const notificationContainer = document.getElementById('notificationContainer');
 
-    // Mostrar el contenedor de notificaciones y el loader
     notificationContainer.style.display = 'block';
-    loader.style.display = 'block'; // Muestra el loader
+    loader.style.display = 'block';
 
     // Obtener los valores del formulario
     const monto = document.getElementById('monto').value;
@@ -26,145 +116,118 @@ document.getElementById('ingresoForm').addEventListener('submit', async function
     const userEmailElement = document.getElementById('userEmail');
     const usuario = userEmailElement.textContent;
 
-    // Obtener la fecha actual (FechaIngreso) en la zona horaria local
+    // Obtener la fecha actual
     const fechaActual = new Date();
     const year = fechaActual.getFullYear();
-    const month = String(fechaActual.getMonth() + 1).padStart(2, '0'); // +1 porque getMonth() empieza desde 0
-    const day = String(fechaActual.getDate()).padStart(2, '0'); // Asegurarse de que tenga dos dígitos
-
-    const fechaFormateada = `${year}-${month}-${day}`; // Formato YYYY-MM-DD
+    const month = String(fechaActual.getMonth() + 1).padStart(2, '0');
+    const day = String(fechaActual.getDate()).padStart(2, '0');
+    const fechaFormateada = `${year}-${month}-${day}`;
 
     // Construir el objeto para enviar al API
     const datosIngreso = {
         Motivo: motivo,
-        Monto: parseFloat(monto), // Asegurarse de que sea un número
+        Monto: parseFloat(monto),
         FechaIngreso: fechaFormateada,
         Metodo: metodo,
         Usuario: usuario
     };
 
-    const response = await fetch('/out/ingresos', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datosIngreso)
-    });
+    try {
+        const response = await fetch('/out/ingresos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosIngreso)
+        });
 
-    // Ocultar el loader
-    loader.style.display = 'none'; // Oculta el loader
+        // Ocultar el loader
+        loader.style.display = 'none';
 
-    // Limpiar el contenedor de notificaciones
-    const notificationsContainer = document.getElementById('notificationsContainer');
-    notificationsContainer.innerHTML = ''; // Limpiar notificaciones anteriores
+        // Limpiar notificaciones anteriores
+        const notificationsContainer = document.getElementById('notificationsContainer');
+        notificationsContainer.innerHTML = '';
 
-    if (response.ok) {
-        const data = await response.json();
+        if (response.ok) {
+            const data = await response.json();
 
-        // Crear la notificación de éxito
-        const successNotification = document.createElement('div');
-        successNotification.className = 'success';
-        successNotification.innerHTML = `
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" class="succes-svg">
-                        <path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <div class="success-prompt-wrap">
-                    <p class="success-prompt-heading">Gasto insertado correctamente!</p>
-                    <div class="success-prompt-prompt">
-                        <p>
-                            Usted acaba de realizar un ingreso a sus gastos de manera correcta!
-                        </p>
-                    </div>
-                </div>
-            </div>
-        `;
+            // Mostrar notificación de éxito
+            showNotification(
+                'success',
+                '¡Gasto insertado correctamente!',
+                'Usted acaba de realizar un ingreso a sus gastos de manera correcta!'
+            );
 
-        // Agregar la notificación al contenedor
-        notificationsContainer.appendChild(successNotification);
+            // Limpiar el formulario
+            document.getElementById('ingresoForm').reset();
+            
+            // Resetear el select custom
+            const customSelectTrigger = document.querySelector('.custom-select-trigger span');
+            if (customSelectTrigger) {
+                customSelectTrigger.textContent = 'Seleccione una opción';
+            }
+            
+            // Remover la clase selected de las opciones
+            document.querySelectorAll('.custom-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
 
-        // Eliminar la notificación de éxito después de 5 segundos
-        setTimeout(() => {
-            successNotification.remove();
-        }, 5000); // 5000 ms = 5 segundos
+        } else {
+            const errorData = await response.json();
 
-        //console.log('Respuesta del servidor:', data);
-    } else {
-        const errorData = await response.json();
+            // Mostrar notificación de error
+            showNotification(
+                'error',
+                'Error al registrar el ingreso',
+                errorData.error || 'Hubo un problema al procesar su solicitud.'
+            );
+        }
+    } catch (error) {
+        // Ocultar el loader en caso de error
+        loader.style.display = 'none';
 
-        // Crear la notificación de error
-        const errorNotification = document.createElement('div');
-        errorNotification.className = 'error';
-        errorNotification.innerHTML = `
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" class="error-svg">
-                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-15a1 1 0 011 1v7a1 1 0 11-2 0V4a1 1 0 011-1zm0 12a1 1 0 100-2 1 1 0 000 2z"></path>
-                    </svg>
-                </div>
-                <div class="error-prompt-wrap">
-                    <p class="error-prompt-heading">Error al registrar el ingreso!</p>
-                    <div class="error-prompt-prompt">
-                        <p>${errorData.error}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Agregar la notificación de error al contenedor
-        notificationsContainer.appendChild(errorNotification);
-
-        // Eliminar la notificación de error después de 5 segundos
-        setTimeout(() => {
-            errorNotification.remove();
-        }, 5000); // 5000 ms = 5 segundos
-
-        //console.log('Error:', errorData);
+        // Mostrar notificación de error de conexión
+        showNotification(
+            'error',
+            'Error de conexión',
+            'No se pudo conectar con el servidor. Por favor, intente nuevamente.'
+        );
     }
 });
 
+// ===== LOGOUT =====
 document.getElementById('logoutButton').addEventListener('click', async function() {
     try {
         const response = await fetch('/auth/logout', {
             method: 'POST',
-            credentials: 'include' // Incluir cookies de sesión
+            credentials: 'include'
         });
 
-        // Si la respuesta es un JSON válido
         if (response.headers.get('content-type').includes('application/json')) {
             const result = await response.json();
 
-            // Manejar el caso de error específico
             if (!response.ok) {
-                // Redirigir al inicio de sesión sin alertas
                 window.location.href = '/';
                 return;
             }
 
-            // Si la respuesta es exitosa
             localStorage.removeItem('isLoggedIn');
-            window.location.href = '/'; // Redirigir a la página de inicio
+            window.location.href = '/';
         } else {
-            // Si la respuesta no es JSON, redirigir también
-            window.location.href = '/'; // Redirigir a la página de inicio de sesión
+            window.location.href = '/';
         }
         
     } catch (error) {
-        // En caso de cualquier error, redirigir sin mostrar alertas
-        window.location.href = '/'; // Redirigir a la página de inicio
+        window.location.href = '/';
     }
 });
 
-
-
-// Obtener el correo del usuario y mostrarlo en el frontend
+// ===== OBTENER EMAIL DEL USUARIO =====
 async function fetchUserEmail() {
     try {
         const response = await fetch('/auth/perfil', {
             method: 'GET',
-            credentials: 'include' // Incluir la sesión
+            credentials: 'include'
         });
 
         const result = await response.json();
@@ -175,15 +238,15 @@ async function fetchUserEmail() {
 
         document.getElementById('userEmail').textContent = result.email;
     } catch (error) {
-        //console.log("")
-        //alert(error.message);
+        // Silenciar error
     }
 }
 
 fetchUserEmail();
 
+// ===== CARGAR MÉTODOS DE PAGO EN SELECT CUSTOM =====
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('http://localhost:3000/out/paysMethod')
+    fetch('/out/paysMethod')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Error en la petición');
@@ -191,16 +254,50 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.json();
         })
         .then(data => {
-            const select = document.getElementById('opciones');
+            const optionsContainer = document.querySelector('.custom-options');
+            const hiddenInput = document.getElementById('opciones');
+            const selectTrigger = document.querySelector('.custom-select-trigger');
 
+            // Limpiar opciones existentes
+            optionsContainer.innerHTML = '';
+
+            // Agregar cada opción
             data.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.ID;        // Puedes usar item.NOMBRE si prefieres
-                option.textContent = item.NOMBRE;
-                select.appendChild(option);
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('custom-option');
+                optionElement.textContent = item.NOMBRE;
+                optionElement.dataset.value = item.ID;
+                optionsContainer.appendChild(optionElement);
+            });
+
+            // Event listeners para las opciones
+            optionsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('custom-option')) {
+                    const selectedValue = e.target.dataset.value;
+                    const selectedText = e.target.textContent;
+                    
+                    selectTrigger.querySelector('span').textContent = selectedText;
+                    hiddenInput.value = selectedValue;
+                    
+                    // Remover clase selected de todas las opciones
+                    optionsContainer.querySelectorAll('.custom-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Agregar clase selected a la opción clickeada
+                    e.target.classList.add('selected');
+                    
+                    // Cerrar el dropdown
+                    document.getElementById('customSelect').classList.remove('open');
+                }
             });
         })
         .catch(error => {
             console.error('Error al cargar las opciones:', error);
+            showNotification(
+                'error',
+                'Error al cargar opciones',
+                'No se pudieron cargar los métodos de pago.'
+            );
         });
 });
