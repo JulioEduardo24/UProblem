@@ -82,8 +82,21 @@ const getpaysMethod = async (req, res) => {
   }
 };
 
+
+const EgresosTarjetaPerUsuario = async (req, res) => {
+  try {
+    // Ejecutamos el procedimiento almacenado directamente
+    const usuario = req.body.Usuario;
+    const results = await db.query('CALL getEgresosTarjeta("' + usuario + '")');
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error(error); // Para depurar si algo falla
+    return res.status(500).json({ error: 'Error al obtener los metodos de pago' });
+  }
+};
+
 export {
   createIngreso,
-  getPaysPerMonth,
-  getpaysMethod
+  getpaysMethod,
+  EgresosTarjetaPerUsuario
 };

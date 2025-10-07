@@ -244,6 +244,7 @@ async function fetchUserEmail() {
 
 fetchUserEmail();
 
+
 // ===== CARGAR MÉTODOS DE PAGO EN SELECT CUSTOM =====
 document.addEventListener('DOMContentLoaded', () => {
     fetch('/out/paysMethod')
@@ -300,4 +301,133 @@ document.addEventListener('DOMContentLoaded', () => {
                 'No se pudieron cargar los métodos de pago.'
             );
         });
+        // Botón para actualizar manualmente
+    document.getElementById("btnActualizarGastos").addEventListener("click", () => {
+      const userInfo = document.getElementById('userInfo');
+      const userEmailSpan = document.getElementById('userEmail');
+      if (userEmailSpan) {
+        cargarGastos(userEmailSpan);
+      } else {
+        alert("No se pudo obtener el usuario. Intenta recargar la página.");
+      }
+    });
+
 });
+
+
+    // Alternar tema y guardarlo en localStorage
+    const toggleBtn = document.getElementById('themeToggle');
+    const body = document.body;
+
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark-mode');
+      toggleBtn.textContent = '☀️';
+    } else {
+      toggleBtn.textContent = '🌙';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const darkMode = body.classList.contains('dark-mode');
+      toggleBtn.textContent = darkMode ? '☀️' : '🌙';
+      localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    });
+
+    // Custom Select Logic
+    const customSelect = document.getElementById('customSelect');
+    const selectTrigger = customSelect.querySelector('.custom-select-trigger');
+    const optionsContainer = customSelect.querySelector('.custom-options');
+    const hiddenInput = document.getElementById('opciones');
+
+    const opciones = [
+      { value: 'efectivo', text: 'Efectivo' },
+      { value: 'tarjeta', text: 'Tarjeta de crédito' },
+      { value: 'transferencia', text: 'Transferencia bancaria' },
+      { value: 'paypal', text: 'PayPal' },
+    ];
+
+    opciones.forEach(option => {
+      const optionElement = document.createElement('div');
+      optionElement.classList.add('custom-option');
+      optionElement.textContent = option.text;
+      optionElement.dataset.value = option.value;
+      optionsContainer.appendChild(optionElement);
+    });
+
+    selectTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      customSelect.classList.toggle('open');
+    });
+
+    optionsContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('custom-option')) {
+        const selectedValue = e.target.dataset.value;
+        const selectedText = e.target.textContent;
+        selectTrigger.querySelector('span').textContent = selectedText;
+        hiddenInput.value = selectedValue;
+        optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        e.target.classList.add('selected');
+        customSelect.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', () => customSelect.classList.remove('open'));
+    // Mostrar tooltip con el correo/nombre en móviles
+    const userInfo = document.getElementById('userInfo');
+    const userEmailSpan = document.getElementById('userEmail');
+
+    // Crear tooltip dinámico
+    const tooltip = document.createElement('div');
+    tooltip.classList.add('user-tooltip');
+    document.body.appendChild(tooltip);
+
+    let tooltipVisible = false;
+
+    // Cerrar tooltip si se toca fuera
+    document.addEventListener('click', () => {
+      if (tooltipVisible) {
+        tooltip.classList.remove('show');
+        tooltipVisible = false;
+      }
+    });
+    const form = document.getElementById('ingresoForm');
+    const montoInput = document.getElementById('monto');
+
+    form.addEventListener('submit', (e) => {
+      const monto = parseFloat(montoInput.value);
+      if (isNaN(monto) || monto < 0) {
+        e.preventDefault(); // Detiene el envío
+        alert('El monto no puede ser negativo.');
+        montoInput.focus();
+      }
+    });
+
+
+    
+async function cargarGastos(usuario) {
+  const montoElement = document.getElementById("montoGastos");
+  montoElement.textContent = "Cargando...";
+
+  if (usuario instanceof HTMLElement) {
+    usuario = usuario.textContent.trim();
+  }
+
+  console.log("Usuario (texto):", usuario);
+
+  try {
+    const response = await fetch("/out/EgresosTarjetaPerUsuario", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ Usuario: usuario })
+    });
+
+    const data = await response.json();
+    const monto = data[0]?.TotalIngresos ?? 0;
+    montoElement.textContent = `$${monto.toLocaleString("es-ES")}`;
+  } catch (error) {
+    console.error(error);
+    montoElement.textContent = "Error al cargar gastos";
+  }
+}
+
+
