@@ -26,7 +26,7 @@ const createIngreso = async (req, res) => {
     let fechaPago;
 
     // Si el día es menor o igual a 12, la fecha de pago es el último día del mismo mes
-    if (diaIngreso <= 12) {
+    if (diaIngreso <= 10) {
       fechaPago = getLastDayOfMonth(fechaIngresoDate.getUTCFullYear(), fechaIngresoDate.getUTCMonth());
     } else {
       // Si el día es mayor a 12, la fecha de pago es el último día del mes siguiente

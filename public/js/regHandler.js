@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', function () {
         email: email, 
         password: password
     };
-    console.log("-----");
+    
+    /*console.log("-----");
     console.log(datosIngreso);
-    console.log("-----");
-
+    console.log("-----");*/
     const response = await fetch('/auth/registerUser', {
         method: 'POST',
         headers: {
