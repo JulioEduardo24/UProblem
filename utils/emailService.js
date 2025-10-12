@@ -1,13 +1,23 @@
 import nodemailer from 'nodemailer';
 
 // Configurar el transportador de email
-const transporter = nodemailer.createTransport({
+/*const transporter = nodemailer.createTransport({
     service: 'gmail', // O tu servicio de email
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD, // Usa contraseña de aplicación si usas Gmail
     }
-});
+});*/
+
+const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD
+        }
+    });
 
 const sendVerificationEmail = async (email, username, verificationLink) => {
     const mailOptions = {
