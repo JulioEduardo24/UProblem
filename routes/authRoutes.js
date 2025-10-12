@@ -2,14 +2,18 @@
 import express from "express";
 const router = express.Router();
 import { verificarSesion } from '../middleware/auth.js';
-import { formularioLogin, Registrar, Registro, Login, Perfil} from '../controllers/authController.js'
+import { formularioLogin, Registrar, Registro, Login, Perfil, VerificiarEmail, VerificiarEmailPage, ConfirmarVerificacion} from '../controllers/authController.js'
 
 router.get('/', formularioLogin);
 
 router.post('/login', Login );
 router.get('/register', Registrar);
 router.post('/registerUser', Registro );
-
+//router.get('/verificar-email', VerificiarEmail);
+// Ruta para mostrar página de verificación
+router.get('/verificar-email', VerificiarEmailPage);
+// Ruta API para confirmar verificación
+router.post('/confirmar-verificacion', ConfirmarVerificacion);
 // Cierre de sesión
 router.post('/logout', verificarSesion, (req, res) => {
     //console.log('Intentando destruir la sesión'); // Log de depuración

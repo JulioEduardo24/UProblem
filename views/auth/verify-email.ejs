@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Verificar Email</title>
+    <link rel="stylesheet" href="/css/styleLog.css">
+    <link rel="icon" href="/img/usuario.png" type="image/png">
+</head>
+<body>
+    <button id="themeToggle" class="theme-toggle">🌙</button>
+
+    <div class="containerbg">
+        <div class="container">
+            <div class="form verify-form">
+                <% if (status === 'pending') { %>
+                    <!-- Estado: Token válido, esperando confirmación -->
+                    <div class="verify-icon success-icon">
+                        ✓
+                    </div>
+                    <h2 class="verify-title">Verificar tu Email</h2>
+                    <p class="verify-message">
+                        Tu email ha sido encontrado. Haz clic en el botón de abajo para verificar tu cuenta.
+                    </p>
+                    <button id="confirmBtn" class="button-confirm" data-token="<%= token %>">
+                        Verificar Email
+                    </button>
+                    <p class="verify-footer">
+                        Este enlace expirará en 24 horas
+                    </p>
+
+                <% } else if (status === 'error') { %>
+                    <!-- Estado: Error o token inválido -->
+                    <div class="verify-icon error-icon">
+                        ✗
+                    </div>
+                    <h2 class="verify-title">Error de Verificación</h2>
+                    <p class="verify-message error-message">
+                        <%= message %>
+                    </p>
+                    <a href="/" class="button-confirm" style="text-decoration: none; text-align: center;">
+                        Volver al Login
+                    </a>
+
+                <% } %>
+
+                <div id="errorMessage" class="error"></div>
+                <div id="successMessage" class="success"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === Tema claro/oscuro ===
+        const toggleBtn = document.getElementById('themeToggle');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            toggleBtn.textContent = '☀️';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const darkMode = body.classList.contains('dark-mode');
+            toggleBtn.textContent = darkMode ? '☀️' : '🌙';
+            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+        });
+
+        // === Confirmar verificación ===
+        const confirmBtn = document.getElementById('confirmBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', async function() {
+                const token = this.getAttribute('data-token');
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Verificando...';
+
+                try {
+                    const response = await fetch('/auth/confirmar-verificacion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ token })
+                    });
+
+                    const result = await response.json();
+                    const successMessage = document.getElementById('successMessage');
+                    const errorMessage = document.getElementById('errorMessage');
+
+                    if (response.ok) {
+                        successMessage.textContent = '✓ Email verificado exitosamente. Redirigiendo...';
+                        successMessage.style.display = 'block';
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 2000);
+                    } else {
+                        errorMessage.textContent = result.error || 'Error en la verificación';
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = 'Verificar Email';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('errorMessage').textContent = 'Error en la conexión';
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Verificar Email';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

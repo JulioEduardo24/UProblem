@@ -278,3 +278,133 @@ body.dark-mode .inputForm svg {
   fill: var(--text-main);
 }
 
+/* ===== ESTILOS PARA VERIFICACIÓN DE EMAIL ===== */
+
+.verify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+  padding: 40px 30px;
+}
+
+.verify-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.success-icon {
+  background-color: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+  border: 2px solid #27ae60;
+}
+
+.error-icon {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+}
+
+body.dark-mode .success-icon {
+  background-color: rgba(39, 174, 96, 0.15);
+  border-color: #2ecc71;
+  color: #2ecc71;
+}
+
+body.dark-mode .error-icon {
+  background-color: rgba(231, 76, 60, 0.15);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.verify-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 10px 0;
+  transition: color 0.3s ease;
+}
+
+.verify-message {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin: 15px 0;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.verify-message.error-message {
+  color: #e74c3c;
+}
+
+body.dark-mode .verify-message.error-message {
+  color: #ff6b6b;
+}
+
+.verify-footer {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 15px;
+  opacity: 0.7;
+  transition: color 0.3s ease;
+}
+
+.success {
+  background-color: rgba(39, 174, 96, 0.1);
+  border: 1px solid #27ae60;
+  color: #27ae60;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 10px;
+  display: none;
+  animation: slideIn 0.3s ease-out;
+}
+
+body.dark-mode .success {
+  background-color: rgba(39, 174, 96, 0.15);
+  border-color: #2ecc71;
+  color: #2ecc71;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botón en estado cargando */
+.button-confirm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button-confirm:disabled:hover {
+  transform: none;
+  background-color: var(--primary);
+}
