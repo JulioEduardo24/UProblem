@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendVerificationEmail = async (email, username, verificationLink) => {
   try {
     await resend.emails.send({
-      from: 'Verificación <tu-email@tudominio.com>',
+      from: 'Verificación <onboarding@resend.dev>',
       to: email,
       subject: 'Verifica tu email para activar tu cuenta',
       html: `
