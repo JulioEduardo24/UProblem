@@ -136,6 +136,15 @@ const Login = async (req, res) => {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
 
+        // Verificar si el email está confirmado
+        if (!usuario.isVerified) {
+            return res.status(403).json({ 
+                error: 'Por favor, verifica tu email antes de iniciar sesión.',
+                requiresVerification: true,
+                userEmail: email
+            });
+        }
+
         const isPasswordValid = await bcrypt.compare(password, usuario.password);
 
         if (!isPasswordValid) {
@@ -145,11 +154,13 @@ const Login = async (req, res) => {
         req.session.isLoggedIn = true;
         req.session.userId = usuario.id;
         req.session.username = usuario.username;
+        req.session.email = usuario.email;
         return res.status(200).json({ message: 'Inicio de sesión exitoso' });
     } catch (error) {
+        console.error('Error al iniciar sesión:', error);
         return res.status(500).json({ error: 'Error al iniciar sesión' });
     }
-}
+};
 
 const Perfil = async (req, res) => {
     const username = req.session.username; 
@@ -161,12 +172,11 @@ const Perfil = async (req, res) => {
     return res.status(200).json({ email: username, message: 'Perfil de usuario' });
 }
 
-
 const VerificiarEmailPage = async (req, res) => {
     const { token } = req.query;
 
     if (!token) {
-        return res.render('verify-email', { 
+        return res.render('auth/verify-email', { 
             status: 'error', 
             message: 'Token de verificación no proporcionado.',
             token: null
@@ -184,7 +194,7 @@ const VerificiarEmailPage = async (req, res) => {
         });
 
         if (!usuario) {
-            return res.render('verify-email', { 
+            return res.render('auth/verify-email', { 
                 status: 'error', 
                 message: 'Token inválido o expirado.',
                 token: null
@@ -192,7 +202,7 @@ const VerificiarEmailPage = async (req, res) => {
         }
 
         // Mostrar página con token válido
-        return res.render('verify-email', { 
+        return res.render('auth/verify-email', { 
             status: 'pending', 
             message: 'Haz clic en el botón para verificar tu email',
             token: token
@@ -200,7 +210,7 @@ const VerificiarEmailPage = async (req, res) => {
 
     } catch (error) {
         console.error('Error al verificar email:', error);
-        return res.render('verify-email', { 
+        return res.render('auth/verify-email', { 
             status: 'error', 
             message: 'Error al procesar la verificación',
             token: null
@@ -246,6 +256,56 @@ const ConfirmarVerificacion = async (req, res) => {
     }
 };
 
+//vista verificacion
+
+const verificacion_email = (req, res) => {
+    res.render('auth/verify-email')
+}
+
+//reenviar verificación 
+const ReenviarVerificacion = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email no proporcionado.' });
+    }
+
+    try {
+        const usuario = await User.findOne({ where: { email } });
+
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+        }
+
+        // Si ya está verificado
+        if (usuario.isVerified) {
+            return res.status(400).json({ error: 'Este usuario ya está verificado.' });
+        }
+
+        // Generar nuevo token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        // Actualizar usuario
+        usuario.verificationToken = verificationToken;
+        usuario.verificationTokenExpires = verificationTokenExpires;
+        await usuario.save();
+
+        // Enviar email
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const verificationLink = `${frontendUrl}/auth/verificar-email?token=${verificationToken}`;
+        await sendVerificationEmail(email, usuario.username, verificationLink);
+
+        return res.status(200).json({
+            message: 'Email de verificación reenviado. Revisa tu bandeja de entrada.'
+        });
+
+    } catch (error) {
+        console.error('Error al reenviar verificación:', error);
+        return res.status(500).json({ error: 'Error al reenviar el email.' });
+    }
+};
+
 export {
     formularioLogin,
     Registro,
@@ -254,5 +314,7 @@ export {
     Registrar,
     VerificiarEmail,
     VerificiarEmailPage,
-    ConfirmarVerificacion
+    ConfirmarVerificacion,
+    verificacion_email,
+    ReenviarVerificacion
 }

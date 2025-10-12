@@ -2,7 +2,7 @@
 import express from "express";
 const router = express.Router();
 import { verificarSesion } from '../middleware/auth.js';
-import { formularioLogin, Registrar, Registro, Login, Perfil, VerificiarEmail, VerificiarEmailPage, ConfirmarVerificacion} from '../controllers/authController.js'
+import { formularioLogin, Registrar, Registro, Login, Perfil, VerificiarEmail, VerificiarEmailPage, ConfirmarVerificacion, verificacion_email, ReenviarVerificacion} from '../controllers/authController.js'
 
 router.get('/', formularioLogin);
 
@@ -28,6 +28,8 @@ router.post('/logout', verificarSesion, (req, res) => {
 });
 
 
+router.post('/verify-email', verificacion_email);
 router.get('/perfil', verificarSesion, Perfil);
+router.post('/reenviar-verificacion', ReenviarVerificacion);
 
 export default router
