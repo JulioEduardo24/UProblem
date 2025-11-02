@@ -31,7 +31,5 @@ router.post('/logout', verificarSesion, (req, res) => {
 router.post('/verify-email', verificacion_email);
 router.get('/perfil', verificarSesion, Perfil);
 router.post('/reenviar-verificacion', ReenviarVerificacion);
-//nueva add
-router.post('/reenviar-verificacion2', ReenviarVerificacion);
 
 export default router

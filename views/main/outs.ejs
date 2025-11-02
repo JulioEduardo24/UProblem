@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>Registrar Ingreso</title>
+  <title>Sistema de Gastos</title>
   <link rel="icon" href="/img/salida.png" type="image/png" />
   <link rel="stylesheet" href="/css/style.css" />
-  <script>
-  </script>
 </head>
 <body>
   <header class="navbar">
@@ -16,7 +14,6 @@
         <a class="logo-link">UProblem</a>
       </div>
       <div class="navbar-actions">
-        <!-- NUEVO BLOQUE DE EMAIL/ID -->
         <div class="user-info" id="userInfo">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -26,9 +23,6 @@
           </svg>
           <span id="userEmail"></span>
         </div>
-
-
-        <!-- FIN BLOQUE NUEVO -->
 
         <button id="themeToggle" class="theme-toggle" title="Cambiar tema">🌙</button>
         <a id="logoutButton" class="logout-button" title="Cerrar sesión">
@@ -42,40 +36,101 @@
     </div>
   </header>
 
+  <!-- ===== NAVEGACIÓN POR TABS ===== -->
+  <nav class="tabs-navigation">
+    <div class="tabs-container">
+      <button class="tab-button active" data-tab="registro">
+        <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Registrar Gasto
+      </button>
+      <button class="tab-button" data-tab="gastos">
+        <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        Ver Gastos
+      </button>
+      <button class="tab-button" data-tab="dashboard">
+        <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Dashboard
+      </button>
+    </div>
+  </nav>
+
   <main class="main-wrapper">
-    <section id="resumenGastos" class="resumen-card">
-      <h2>Gastos del mes</h2>
-      <p id="montoGastos"></p>
-      <button id="btnActualizarGastos" class="button-confirm">Ver gastos</button>
-    </section>
-
-
-    <form id="ingresoForm" class="form">
-      <h1 class="title">Registrar Gastos</h1>
-      <label for="monto">Monto:</label>
-      <input type="number" id="monto" name="monto" class="input" step="0.01" placeholder="Ingrese el monto" min="0" required />
-      <label for="motivo">Motivo:</label>
-      <input type="text" id="motivo" name="motivo" class="input" placeholder="Motivo del ingreso" required />
-      <label>Método de pago:</label>
-      
-      <!-- Select Custom -->
-      <div class="custom-select-wrapper">
-        <div class="custom-select" id="customSelect">
-          <div class="custom-select-trigger">
-            <span>Seleccione una opción</span>
-            <svg class="custom-select-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+    <!-- ===== TAB: REGISTRAR GASTO ===== -->
+    <div class="tab-content active" id="tab-registro">
+      <div class="registro-section">
+        <form id="ingresoForm" class="form">
+          <h1 class="title">Registrar Gastos</h1>
+          <label for="monto">Monto:</label>
+          <input type="number" id="monto" name="monto" class="input" step="0.01" placeholder="Ingrese el monto" min="0" required />
+          <label for="motivo">Motivo:</label>
+          <input type="text" id="motivo" name="motivo" class="input" placeholder="Motivo del gasto" required />
+          <label>Método de pago:</label>
+          <div class="custom-select-wrapper">
+            <div class="custom-select" id="customSelect">
+              <div class="custom-select-trigger">
+                <span>Seleccione una opción</span>
+                <svg class="custom-select-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+              <div class="custom-options">
+              </div>
+            </div>
+            <input type="hidden" id="opciones" name="opciones" required />
           </div>
-          <div class="custom-options">
-            <!-- Las opciones se cargarán aquí dinámicamente -->
+          <button type="submit" class="button-confirm">Insertar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== TAB: VER GASTOS ===== -->
+    <div class="tab-content" id="tab-gastos">
+      <div class="gastos-section">
+        <section id="resumenGastos" class="resumen-card" style="margin-bottom: 30px;">
+          <h2>Gastos del mes</h2>
+          <p id="montoGastos">S/ 0.00</p>
+        </section>
+        <div class="gastos-content">
+          <div class="gastos-header">
+            <h1 class="section-title">Historial de Gastos</h1>
+            <button id="btnActualizarGastos" class="button-refresh">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Actualizar
+            </button>
+          </div>
+          <div id="gastosListContainer" class="gastos-list">
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p>No hay gastos registrados</p>
+            <span>Presiona "Actualizar" para cargar los gastos</span>
           </div>
         </div>
-        <input type="hidden" id="opciones" name="opciones" required />
       </div>
+    </div>
 
-      <button type="submit" class="button-confirm">Insertar</button>
-    </form>
+    <!-- ===== TAB: DASHBOARD ===== -->
+    <div class="tab-content" id="tab-dashboard">
+      <div class="dashboard-section">
+        <h1 class="section-title">Dashboard de Análisis</h1>
+        <div class="dashboard-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <h2>Próximamente</h2>
+          <p>Aquí podrás ver gráficos y análisis detallados de tus gastos</p>
+        </div>
+      </div>
+    </div>
 
     <div class="notification-container" id="notificationContainer" style="display: none;">
       <div class="loader" id="loader" style="display: none;">
@@ -86,6 +141,26 @@
       <div id="notificationsContainer"></div>
     </div>
   </main>
+
   <script src="/js/formHandler.js"></script>
+  <script>
+    // Manejo de tabs
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const targetTab = button.getAttribute('data-tab');
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+          button.classList.add('active');
+          const targetContent = document.getElementById(`tab-${targetTab}`);
+          if (targetContent) {
+            targetContent.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
