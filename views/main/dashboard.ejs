@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="<%= user.tema_preferido || 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - UProblem</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>UProblem</h1>
+            <div class="nav-menu">
+                <span class="user-name">Hola, <%= user.nombres %> <%= user.apellidos %></span>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-welcome">
+            <h2>Bienvenido a UProblem</h2>
+            <p>Sistema de gestión de gastos personales con recomendaciones inteligentes</p>
+        </div>
+
+        <div class="user-info-card">
+            <h3>Información de Usuario</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Usuario:</span>
+                    <span class="info-value">@<%= user.usuario %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Correo:</span>
+                    <span class="info-value"><%= user.correo %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Documento:</span>
+                    <span class="info-value"><%= user.tipo_documento %> - <%= user.numero_documento %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Teléfono:</span>
+                    <span class="info-value"><%= user.telefono || 'No registrado' %></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3>Total Gastado</h3>
+                <p class="stat-value">S/ 0.00</p>
+                <span class="stat-label">Este mes</span>
+            </div>
+
+            <div class="stat-card">
+                <h3>Presupuesto</h3>
+                <p class="stat-value">S/ 0.00</p>
+                <span class="stat-label">Mensual</span>
+            </div>
+
+            <div class="stat-card">
+                <h3>Ahorro</h3>
+                <p class="stat-value">0%</p>
+                <span class="stat-label">Del presupuesto</span>
+            </div>
+        </div>
+
+        <div class="dashboard-info">
+            <p>⚠️ Próximamente: Registro de gastos, categorización automática y recomendaciones inteligentes.</p>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+</body>
+</html>

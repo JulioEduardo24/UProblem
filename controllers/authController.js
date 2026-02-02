@@ -1,320 +1,176 @@
+const Auth = require('../models/Auth');
+const jwt = require('jsonwebtoken');
 
-import User from '../models/Auth.js';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
-import { Sequelize } from 'sequelize';
-import { sendVerificationEmail } from '../utils/emailService.js';
-
-const formularioLogin = (req, res) => {
-    res.render('auth/login')
-}
-
-const Registrar = (req, res) => {
-    res.render('auth/register')
-}
-
-const Registro = async (req, res) => {
-    const { username, email, password } = req.body;
-
-    // Validar campos requeridos
-    if (!username || !email || !password) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
-    }
-
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'El formato del email no es válido.' });
-    }
-
-    // Validar longitud de contraseña
-    if (password.length < 6) {
-        return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
-    }
-
-    try {
-        // Verificar si el usuario o email ya existe
-        const usuarioExistente = await User.findOne({
-            where: {
-                [Sequelize.Sequelize.Op.or]: [
-                    { username },
-                    { email }
-                ]
-            }
-        });
-
-        if (usuarioExistente) {
-            return res.status(400).json({ error: 'El nombre de usuario o el correo ya están en uso.' });
-        }
-
-        // Encriptar la contraseña
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        // Generar token de verificación
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-        const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
-
-        // Crear nuevo usuario sin verificar
-        const nuevoUsuario = await User.create({
-            username,
-            email,
-            password: hashedPassword,
-            isVerified: false,
-            verificationToken,
-            verificationTokenExpires,
-        });
-
-        // Enviar email de verificación
-        const frontendUrl = req.headers.referer 
-            ? req.headers.referer.split('/').slice(0, 3).join('/') 
-            : process.env.FRONTEND_URL || 'http://localhost:3000';
-        const verificationLink = `${frontendUrl}/auth/verificar-email?token=${verificationToken}`;
-        await sendVerificationEmail(email, username, verificationLink);
-
-        return res.status(201).json({
-            message: 'Usuario registrado exitosamente. Por favor, verifica tu email para activar tu cuenta.',
-            userId: nuevoUsuario.id,
-        });
-
-    } catch (error) {
-        console.error('Error al registrar el usuario:', error);
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(400).json({ error: 'El nombre de usuario o el correo ya están en uso.' });
-        }
-        return res.status(500).json({ error: 'Error al registrar el usuario.' });
-    }
+exports.showRegister = (req, res) => {
+  res.render('auth/register', { error: null });
 };
 
-// Controlador para verificar email
-const VerificiarEmail = async (req, res) => {
-    const { token } = req.query;
-
-    if (!token) {
-        return res.status(400).json({ error: 'Token de verificación no proporcionado.' });
-    }
-
-    try {
-        const usuario = await User.findOne({
-            where: {
-                verificationToken: token,
-                verificationTokenExpires: {
-                    [Sequelize.Sequelize.Op.gt]: new Date() // Token no expirado
-                }
-            }
-        });
-
-        if (!usuario) {
-            return res.status(400).json({ error: 'Token inválido o expirado.' });
-        }
-
-        // Marcar usuario como verificado
-        usuario.isVerified = true;
-        usuario.verificationToken = null;
-        usuario.verificationTokenExpires = null;
-        await usuario.save();
-
-        return res.status(200).json({ message: 'Email verificado exitosamente. Puedes iniciar sesión.' });
-
-    } catch (error) {
-        console.error('Error al verificar email:', error);
-        return res.status(500).json({ error: 'Error al verificar el email.' });
-    }
+exports.showLogin = (req, res) => {
+  const registered = req.query.registered === 'true';
+  res.render('auth/login', { 
+    error: null,
+    success: registered ? 'Cuenta creada exitosamente. Inicia sesión.' : null
+  });
 };
 
-const Login = async (req, res) => {
-    const { email, password } = req.body;
+exports.register = async (req, res) => {
+  try {
+    const { 
+      nombres, apellidos, fecha_nacimiento, sexo, usuario, correo, 
+      password, confirmPassword, tipo_documento, numero_documento, telefono 
+    } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    if (!nombres || !apellidos || !fecha_nacimiento || !sexo || !usuario || 
+        !correo || !password || !tipo_documento || !numero_documento) {
+      return res.render('auth/register', { 
+        error: 'Todos los campos obligatorios deben completarse' 
+      });
     }
 
-    try {
-        const usuario = await User.findOne({ where: { email } });
-
-        if (!usuario) {
-            return res.status(401).json({ error: 'Credenciales incorrectas' });
-        }
-
-        // Verificar si el email está confirmado
-        if (!usuario.isVerified) {
-            return res.status(403).json({ 
-                error: 'Por favor, verifica tu email antes de iniciar sesión.',
-                requiresVerification: true,
-                userEmail: email
-            });
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, usuario.password);
-
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Credenciales incorrectas' });
-        }
-
-        req.session.isLoggedIn = true;
-        req.session.userId = usuario.id;
-        req.session.username = usuario.username;
-        req.session.email = usuario.email;
-        return res.status(200).json({ message: 'Inicio de sesión exitoso' });
-    } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        return res.status(500).json({ error: 'Error al iniciar sesión' });
+    if (password !== confirmPassword) {
+      return res.render('auth/register', { 
+        error: 'Las contraseñas no coinciden' 
+      });
     }
+
+    if (password.length < 8) {
+      return res.render('auth/register', { 
+        error: 'La contraseña debe tener al menos 8 caracteres' 
+      });
+    }
+
+    if (usuario.length < 4) {
+      return res.render('auth/register', { 
+        error: 'El usuario debe tener al menos 4 caracteres' 
+      });
+    }
+
+    const fechaNac = new Date(fecha_nacimiento);
+    const edad = Math.floor((new Date() - fechaNac) / (365.25 * 24 * 60 * 60 * 1000));
+    if (edad < 18) {
+      return res.render('auth/register', { 
+        error: 'Debes ser mayor de 18 años' 
+      });
+    }
+
+    const existingEmail = await Auth.findByEmail(correo);
+    if (existingEmail) {
+      return res.render('auth/register', { 
+        error: 'El correo ya está registrado' 
+      });
+    }
+
+    const existingUsername = await Auth.findByUsername(usuario);
+    if (existingUsername) {
+      return res.render('auth/register', { 
+        error: 'El nombre de usuario ya está en uso' 
+      });
+    }
+
+    const existingDocument = await Auth.findByDocument(numero_documento);
+    if (existingDocument) {
+      return res.render('auth/register', { 
+        error: 'El número de documento ya está registrado' 
+      });
+    }
+
+    await Auth.createUser({
+      nombres, apellidos, fecha_nacimiento, sexo, usuario, correo,
+      password, tipo_documento, numero_documento, telefono
+    });
+
+    res.redirect('/auth/login?registered=true');
+
+  } catch (error) {
+    console.error('Error en registro:', error);
+    res.render('auth/register', { 
+      error: 'Error al crear la cuenta. Intenta nuevamente.' 
+    });
+  }
 };
 
-const Perfil = async (req, res) => {
-    const username = req.session.username; 
+exports.login = async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
 
-    if (!username) {
-        return res.status(400).json({ error: 'No se encontró el correo en la sesión' });
+    if (!identifier || !password) {
+      return res.render('auth/login', { 
+        error: 'Usuario/Correo y contraseña son obligatorios',
+        success: null
+      });
     }
 
-    return res.status(200).json({ email: username, message: 'Perfil de usuario' });
-}
-
-const VerificiarEmailPage = async (req, res) => {
-    const { token } = req.query;
-
-    if (!token) {
-        return res.render('auth/verify-email', { 
-            status: 'error', 
-            message: 'Token de verificación no proporcionado.',
-            token: null
-        });
+    const user = await Auth.findByEmailOrUsername(identifier);
+    if (!user) {
+      return res.render('auth/login', { 
+        error: 'Credenciales incorrectas',
+        success: null
+      });
     }
 
-    try {
-        const usuario = await User.findOne({
-            where: {
-                verificationToken: token,
-                verificationTokenExpires: {
-                    [Sequelize.Op.gt]: new Date()
-                }
-            }
-        });
-
-        if (!usuario) {
-            return res.render('auth/verify-email', { 
-                status: 'error', 
-                message: 'Token inválido o expirado.',
-                token: null
-            });
-        }
-
-        // Mostrar página con token válido
-        return res.render('auth/verify-email', { 
-            status: 'pending', 
-            message: 'Haz clic en el botón para verificar tu email',
-            token: token
-        });
-
-    } catch (error) {
-        console.error('Error al verificar email:', error);
-        return res.render('auth/verify-email', { 
-            status: 'error', 
-            message: 'Error al procesar la verificación',
-            token: null
-        });
+    const isValidPassword = await Auth.verifyPassword(password, user.password);
+    if (!isValidPassword) {
+      return res.render('auth/login', { 
+        error: 'Credenciales incorrectas',
+        success: null
+      });
     }
+
+    const token = jwt.sign(
+      { 
+        userId: user.id,
+        nombres: user.nombres,
+        apellidos: user.apellidos
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.cookie('theme', user.tema_preferido || 'light', {
+      maxAge: 365 * 24 * 60 * 60 * 1000
+    });
+
+    res.redirect('/dashboard');
+
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.render('auth/login', { 
+      error: 'Error al iniciar sesión. Intenta nuevamente.',
+      success: null
+    });
+  }
 };
 
-// API para confirmar la verificación
-const ConfirmarVerificacion = async (req, res) => {
-    const { token } = req.body;
-
-    if (!token) {
-        return res.status(400).json({ error: 'Token no proporcionado.' });
-    }
-
-    try {
-        const usuario = await User.findOne({
-            where: {
-                verificationToken: token,
-                verificationTokenExpires: {
-                    [Sequelize.Op.gt]: new Date()
-                }
-            }
-        });
-
-        if (!usuario) {
-            return res.status(400).json({ error: 'Token inválido o expirado.' });
-        }
-
-        // Marcar usuario como verificado
-        usuario.isVerified = true;
-        usuario.verificationToken = null;
-        usuario.verificationTokenExpires = null;
-        await usuario.save();
-
-        return res.status(200).json({ 
-            message: 'Email verificado exitosamente. Redirigiendo...' 
-        });
-
-    } catch (error) {
-        console.error('Error al verificar email:', error);
-        return res.status(500).json({ error: 'Error al verificar el email.' });
-    }
+exports.logout = (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/auth/login');
 };
 
-//vista verificacion
-
-const verificacion_email = (req, res) => {
-    res.render('auth/verify-email')
-}
-
-//reenviar verificación 
-const ReenviarVerificacion = async (req, res) => {
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json({ error: 'Email no proporcionado.' });
-    }
-
-    try {
-        const usuario = await User.findOne({ where: { email } });
-
-        if (!usuario) {
-            return res.status(404).json({ error: 'Usuario no encontrado.' });
-        }
-
-        // Si ya está verificado
-        if (usuario.isVerified) {
-            return res.status(400).json({ error: 'Este usuario ya está verificado.' });
-        }
-
-        // Generar nuevo token
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-        const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-        // Actualizar usuario
-        usuario.verificationToken = verificationToken;
-        usuario.verificationTokenExpires = verificationTokenExpires;
-        await usuario.save();
-
-        // Enviar email
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-        const verificationLink = `${frontendUrl}/auth/verificar-email?token=${verificationToken}`;
-        await sendVerificationEmail(email, usuario.username, verificationLink);
-
-        return res.status(200).json({
-            message: 'Email de verificación reenviado. Revisa tu bandeja de entrada.'
-        });
-
-    } catch (error) {
-        console.error('Error al reenviar verificación:', error);
-        return res.status(500).json({ error: 'Error al reenviar el email.' });
-    }
+exports.showDashboard = async (req, res) => {
+  try {
+    const user = await Auth.findById(req.userId);
+    res.render('main/dashboard', { user });
+  } catch (error) {
+    console.error('Error al cargar dashboard:', error);
+    res.redirect('/auth/login');
+  }
 };
 
-export {
-    formularioLogin,
-    Registro,
-    Login,
-    Perfil,
-    Registrar,
-    VerificiarEmail,
-    VerificiarEmailPage,
-    ConfirmarVerificacion,
-    verificacion_email,
-    ReenviarVerificacion
-}
+exports.toggleTheme = async (req, res) => {
+  try {
+    const { theme } = req.body;
+    await Auth.updateTheme(req.userId, theme);
+    res.cookie('theme', theme, {
+      maxAge: 365 * 24 * 60 * 60 * 1000
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false });
+  }
+};

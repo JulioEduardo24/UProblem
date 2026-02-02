@@ -2,86 +2,107 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registrarse</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="/css/styleLog.css">
-    <link rel="icon" href="/img/usuario.png" type="image/png">
-    <script src="/js/regHandler.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - UProblem</title>
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
-    <!-- Botón modo claro/oscuro -->
-    <button id="themeToggle" class="theme-toggle">🌙</button>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>UProblem</h1>
+                <p>Crea tu cuenta</p>
+            </div>
 
-    <div class="containerbg">
-        <div class="container">
-            <form id="regisForm" class="form" method="POST">
-                <div class="flex-column">
-                    <label>Nombre </label>
+            <% if (error) { %>
+                <div class="alert alert-error">
+                    <%= error %>
                 </div>
-                <div class="inputForm">
-                    <svg height="60" viewBox="0 -9 32 32" width="40" xmlns="http://www.w3.org/2000/svg">
-                        <g id="Layer_3" data-name="Layer 3">
-                            <path
-                                d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z">
-                            </path>
-                        </g>
-                    </svg>
-                    <input name="name" id="name" placeholder="Ingresa tu nombre" class="input" type="text">
-                </div>
+            <% } %>
 
-                <div class="flex-column">
-                    <label>Email </label>
-                </div>
-                <div class="inputForm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 32 32" height="20">
-                        <g data-name="Layer 3" id="Layer_3">
-                            <path
-                                d="m30.853 13.87a15 15 0 0 0 -29.729 4.082 15.1 15.1 0 0 0 12.876 12.918 15.6 15.6 0 0 0 2.016.13 14.85 14.85 0 0 0 7.715-2.145 1 1 0 1 0 -1.031-1.711 13.007 13.007 0 1 1 5.458-6.529 2.149 2.149 0 0 1 -4.158-.759v-10.856a1 1 0 0 0 -2 0v1.726a8 8 0 1 0 .2 10.325 4.135 4.135 0 0 0 7.83.274 15.2 15.2 0 0 0 .823-7.455zm-14.853 8.13a6 6 0 1 1 6-6 6.006 6.006 0 0 1 -6 6z">
-                            </path>
-                        </g>
-                    </svg>
-                    <input name="email" id="email" placeholder="Ingresa tu Email" class="input" type="email">
+            <form action="/auth/register" method="POST" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombres">Nombres *</label>
+                        <input type="text" id="nombres" name="nombres" placeholder="Juan" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos *</label>
+                        <input type="text" id="apellidos" name="apellidos" placeholder="Pérez García" required>
+                    </div>
                 </div>
 
-                <div class="flex-column">
-                    <label>Clave </label>
-                </div>
-                <div class="inputForm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="-64 0 512 512" height="20">
-                        <path
-                            d="m336 512h-288c-26.453125 0-48-21.523438-48-48v-224c0-26.476562 21.546875-48 48-48h288c26.453125 0 48 21.523438 48 48v224c0 26.476562-21.546875 48-48 48zm-288-288c-8.8125 0-16 7.167969-16 16v224c0 8.832031 7.1875 16 16 16h288c8.8125 0 16-7.167969 16-16v-224c0-8.832031-7.1875-16-16-16zm0 0">
-                        </path>
-                        <path
-                            d="m304 224c-8.832031 0-16-7.167969-16-16v-80c0-52.929688-43.070312-96-96-96s-96 43.070312-96 96v80c0 8.832031-7.167969 16-16 16s-16-7.167969-16-16v-80c0-70.59375 57.40625-128 128-128s128 57.40625 128 128v80c0 8.832031-7.167969 16-16 16zm0 0">
-                        </path>
-                    </svg>
-                    <input placeholder="Ingresa tu clave" class="input" type="password" name="password" id="password">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sexo">Sexo *</label>
+                        <select id="sexo" name="sexo" required>
+                            <option value="">Seleccionar</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div id="errorMessage" class="error"></div>
-                <button type="submit" class="button-confirm">Registrarse</button>
-                <p class="p">¿Ya tienes cuenta? <a class="span" href="/">¡Inicia Sesión!</a></p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo_documento">Tipo de Documento *</label>
+                        <select id="tipo_documento" name="tipo_documento" required>
+                            <option value="">Seleccionar</option>
+                            <option value="DNI">DNI</option>
+                            <option value="CE">Carné de Extranjería</option>
+                            <option value="Pasaporte">Pasaporte</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numero_documento">Número de Documento *</label>
+                        <input type="text" id="numero_documento" name="numero_documento" placeholder="12345678" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" placeholder="987654321">
+                </div>
+
+                <div class="form-group">
+                    <label for="usuario">Nombre de Usuario *</label>
+                    <input type="text" id="usuario" name="usuario" placeholder="juanperez" required minlength="4">
+                    <small>Mínimo 4 caracteres. Úsalo para iniciar sesión.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico *</label>
+                    <input type="email" id="correo" name="correo" placeholder="juan@ejemplo.com" required>
+                    <small>También puedes usarlo para iniciar sesión.</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Contraseña *</label>
+                        <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres" required minlength="8">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar Contraseña *</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repite tu contraseña" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Crear cuenta</button>
             </form>
+
+            <div class="auth-footer">
+                <p>¿Ya tienes cuenta? <a href="/auth/login">Inicia sesión</a></p>
+            </div>
         </div>
     </div>
-
-    <script>
-        // === Alternar modo claro/oscuro ===
-        const toggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
-
-        // Cargar modo guardado
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
-            toggleBtn.textContent = '☀️';
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            const darkMode = body.classList.contains('dark-mode');
-            toggleBtn.textContent = darkMode ? '☀️' : '🌙';
-            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-        });
-    </script>
 </body>
 </html>

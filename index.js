@@ -1,46 +1,39 @@
-// index.js
-import express from 'express';
-import db from './config/db.js';
-import gastosRoutes from './routes/gastosRoutes.js'
-import authRoutes from './routes/authRoutes.js'
-import bodyParser from 'body-parser';
-import session from 'express-session';
-import cors from 'cors';
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const path = require('path');
+require('dotenv').config();
+
+const authRoutes = require('./routes/authRoutes');
+const mainRoutes = require('./routes/mainRoutes');
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
-//conexion bd
-try{
-    await db.authenticate();
-    console.log("conexion correcta")
-}catch(error){
-    console.log(error)
-}
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(session({
-    secret: 'sparkle24',
-    resave: false,
-    saveUninitialized: true,
-}));
-
-// Configurar EJS
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta para la página principal (vista con el formulario)
 app.get('/', (req, res) => {
-    res.render('./auth/login');
+  res.redirect('/auth/login');
 });
-//ruta auth
-app.use('/auth', authRoutes)
-//ruta Insert Gasto
-app.use('/out', gastosRoutes)
 
-app.use( express.static('public'))
-// Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
+app.use('/auth', authRoutes);
+app.use('/', mainRoutes);
+
+app.use((req, res) => {
+  res.status(404).send('Página no encontrada');
+});
+
+app.listen(PORT, () => {
+  console.log('='.repeat(60));
+  console.log('UProblem - Sistema de Gestión de Gastos Personales');
+  console.log('='.repeat(60));
+  console.log(`Servidor: http://localhost:${PORT}`);
+  console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Base de datos: PostgreSQL (Supabase)`);
+  console.log('='.repeat(60));
 });
