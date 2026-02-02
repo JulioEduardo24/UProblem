@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= gasto ? 'Editar' : 'Nuevo' %> Gasto - UProblem</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>UProblem</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/gastos" class="nav-link active">Gastos</a>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <a href="/gastos" class="btn-back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Volver
+                </a>
+                <h2><%= gasto ? 'Editar' : 'Nuevo' %> Gasto</h2>
+            </div>
+
+            <% if (error) { %>
+                <div class="alert alert-error">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <form method="POST" action="<%= gasto ? `/gastos/editar/${gasto.id}` : '/gastos/nuevo' %>" class="gasto-form">
+                <div class="form-group">
+                    <label for="descripcion">Descripción del Gasto *</label>
+                    <input 
+                        type="text" 
+                        id="descripcion" 
+                        name="descripcion" 
+                        placeholder="Ej: Compra en Metro"
+                        value="<%= gasto ? gasto.descripcion : '' %>"
+                        required
+                    >
+                    <small>La IA sugerirá una categoría automáticamente</small>
+                </div>
+
+                <div class="categoria-sugerida" id="categoriaSugerida" style="display: none;">
+                    <div class="sugerencia-header">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                        </svg>
+                        <span>Categoría sugerida por IA:</span>
+                    </div>
+                    <div class="sugerencias-list" id="sugerenciasList"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monto">Monto (S/) *</label>
+                        <input 
+                            type="number" 
+                            id="monto" 
+                            name="monto" 
+                            step="0.01" 
+                            min="0.01"
+                            placeholder="0.00"
+                            value="<%= gasto ? gasto.monto : '' %>"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha">Fecha *</label>
+                        <input 
+                            type="date" 
+                            id="fecha" 
+                            name="fecha"
+                            value="<%= gasto ? gasto.fecha.split('T')[0] : fechaHoy %>"
+                            max="<%= fechaHoy %>"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoría *</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Seleccionar categoría</option>
+                        <% categorias.forEach(cat => { %>
+                            <option value="<%= cat %>" <%= (gasto && gasto.categoria === cat) ? 'selected' : '' %>>
+                                <%= cat %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notas">Notas (opcional)</label>
+                    <textarea 
+                        id="notas" 
+                        name="notas" 
+                        rows="3"
+                        placeholder="Agrega detalles adicionales..."
+                    ><%= gasto && gasto.notas ? gasto.notas : '' %></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/gastos" class="btn btn-outline">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">
+                        <%= gasto ? 'Guardar Cambios' : 'Registrar Gasto' %>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/categorizador.js"></script>
+</body>
+</html>

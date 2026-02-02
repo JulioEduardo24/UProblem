@@ -11,7 +11,9 @@
         <div class="container">
             <h1>UProblem</h1>
             <div class="nav-menu">
-                <span class="user-name">Hola, <%= user.nombres %> <%= user.apellidos %></span>
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/gastos" class="nav-link">Gastos</a>
+                <span class="user-name">Hola, <%= user.nombres %></span>
                 <button id="themeToggle" class="btn-icon" title="Cambiar tema">
                     <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -39,26 +41,15 @@
             <p>Sistema de gestión de gastos personales con recomendaciones inteligentes</p>
         </div>
 
-        <div class="user-info-card">
-            <h3>Información de Usuario</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="info-label">Usuario:</span>
-                    <span class="info-value">@<%= user.usuario %></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Correo:</span>
-                    <span class="info-value"><%= user.correo %></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Documento:</span>
-                    <span class="info-value"><%= user.tipo_documento %> - <%= user.numero_documento %></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Teléfono:</span>
-                    <span class="info-value"><%= user.telefono || 'No registrado' %></span>
-                </div>
-            </div>
+        <div class="dashboard-actions">
+            <a href="/gastos/nuevo" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Registrar Gasto
+            </a>
+            <a href="/gastos" class="btn btn-outline">Ver todos los gastos</a>
         </div>
 
         <div class="dashboard-stats">
@@ -82,7 +73,7 @@
         </div>
 
         <div class="dashboard-info">
-            <p>⚠️ Próximamente: Registro de gastos, categorización automática y recomendaciones inteligentes.</p>
+            <p>✨ Sistema con categorización automática mediante IA</p>
         </div>
     </div>
 

@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const mainRoutes = require('./routes/mainRoutes');
+const gastoRoutes = require('./routes/gastoRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/', mainRoutes);
+app.use('/gastos', gastoRoutes);
 
 app.use((req, res) => {
   res.status(404).send('Página no encontrada');

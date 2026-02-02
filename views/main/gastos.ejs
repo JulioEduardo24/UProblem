@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Gastos - UProblem</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>UProblem</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/gastos" class="nav-link active">Gastos</a>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h2>Mis Gastos</h2>
+                <p class="page-subtitle">Total del mes: <strong>S/ <%= totalMensual.toFixed(2) %></strong></p>
+            </div>
+            <a href="/gastos/nuevo" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nuevo Gasto
+            </a>
+        </div>
+
+        <% if (typeof filtros.success !== 'undefined') { %>
+            <div class="alert alert-success">
+                <% if (filtros.success === 'created') { %>
+                    ✓ Gasto registrado exitosamente
+                <% } else if (filtros.success === 'updated') { %>
+                    ✓ Gasto actualizado exitosamente
+                <% } else if (filtros.success === 'deleted') { %>
+                    ✓ Gasto eliminado exitosamente
+                <% } %>
+            </div>
+        <% } %>
+
+        <div class="filters-card">
+            <form method="GET" action="/gastos" class="filters-form">
+                <div class="filter-group">
+                    <label for="categoria">Categoría</label>
+                    <select name="categoria" id="categoria">
+                        <option value="">Todas</option>
+                        <% categorias.forEach(cat => { %>
+                            <option value="<%= cat %>" <%= filtros.categoria === cat ? 'selected' : '' %>>
+                                <%= cat %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="fechaInicio">Desde</label>
+                    <input type="date" name="fechaInicio" id="fechaInicio" value="<%= filtros.fechaInicio || '' %>">
+                </div>
+
+                <div class="filter-group">
+                    <label for="fechaFin">Hasta</label>
+                    <input type="date" name="fechaFin" id="fechaFin" value="<%= filtros.fechaFin || '' %>">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+                <a href="/gastos" class="btn btn-outline">Limpiar</a>
+            </form>
+        </div>
+
+        <% if (gastos.length === 0) { %>
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h3>No hay gastos registrados</h3>
+                <p>Comienza registrando tu primer gasto</p>
+                <a href="/gastos/nuevo" class="btn btn-primary">Registrar Gasto</a>
+            </div>
+        <% } else { %>
+            <div class="gastos-list">
+                <% gastos.forEach(gasto => { %>
+                    <div class="gasto-card">
+                        <div class="gasto-header">
+                            <div class="gasto-info">
+                                <h3 class="gasto-descripcion"><%= gasto.descripcion %></h3>
+                                <span class="gasto-categoria categoria-<%= gasto.categoria.toLowerCase().replace(/\s+/g, '-') %>">
+                                    <%= gasto.categoria %>
+                                </span>
+                                <% if (gasto.categoria_manual === false) { %>
+                                    <span class="badge-auto" title="Categorizado automáticamente">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                                        </svg>
+                                        Auto
+                                    </span>
+                                <% } %>
+                            </div>
+                            <div class="gasto-monto">S/ <%= parseFloat(gasto.monto).toFixed(2) %></div>
+                        </div>
+                        
+                        <div class="gasto-details">
+                            <span class="gasto-fecha">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <%= new Date(gasto.fecha).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                            </span>
+                            <% if (gasto.notas) { %>
+                                <span class="gasto-notas">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                    <%= gasto.notas %>
+                                </span>
+                            <% } %>
+                        </div>
+
+                        <div class="gasto-actions">
+                            <a href="/gastos/editar/<%= gasto.id %>" class="btn-action btn-edit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Editar
+                            </a>
+                            <form method="POST" action="/gastos/eliminar/<%= gasto.id %>" style="display: inline;" onsubmit="return confirm('¿Eliminar este gasto?')">
+                                <button type="submit" class="btn-action btn-delete">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+
+    <script src="/js/theme.js"></script>
+</body>
+</html>
