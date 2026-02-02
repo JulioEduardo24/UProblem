@@ -3,18 +3,16 @@ const categorizador = require('../utils/categorizador');
 
 class Gasto {
   static async crear(gastoData) {
-    const categoriaSugerida = categorizador.categorizar(gastoData.descripcion);
-    
     const { data, error } = await supabase
       .from('gastos')
       .insert([{
         usuario_id: gastoData.usuario_id,
         descripcion: gastoData.descripcion,
         monto: gastoData.monto,
-        categoria: gastoData.categoria || categoriaSugerida,
+        categoria: gastoData.categoria,
         fecha: gastoData.fecha,
-        categoria_sugerida: categoriaSugerida,
-        categoria_manual: gastoData.categoria ? true : false,
+        categoria_sugerida: gastoData.categoria_sugerida,
+        categoria_manual: gastoData.categoria_manual,
         notas: gastoData.notas || null
       }])
       .select()

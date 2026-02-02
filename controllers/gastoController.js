@@ -68,14 +68,14 @@ exports.sugerirCategoria = async (req, res) => {
 
 exports.crear = async (req, res) => {
   try {
-    const { descripcion, monto, categoria, fecha, notas } = req.body;
+    const { descripcion, monto, categoria, fecha, notas, categoria_sugerida, categoria_manual_override } = req.body;
 
-    if (!descripcion || !monto || !fecha) {
+    if (!descripcion || !monto || !categoria || !fecha) {
       return res.render('main/gasto-form', {
         gasto: req.body,
         categorias: CATEGORIAS,
         fechaHoy: fecha,
-        error: 'Descripción, monto y fecha son obligatorios'
+        error: 'Descripción, monto, categoría y fecha son obligatorios'
       });
     }
 
@@ -88,11 +88,16 @@ exports.crear = async (req, res) => {
       });
     }
 
+    // Determinar si fue manual o automático
+    const esManual = categoria_manual_override === 'true';
+
     await Gasto.crear({
       usuario_id: req.userId,
       descripcion,
       monto: parseFloat(monto),
-      categoria: categoria || null,
+      categoria: categoria,
+      categoria_sugerida: categoria_sugerida || categoria,
+      categoria_manual: esManual,
       fecha,
       notas
     });

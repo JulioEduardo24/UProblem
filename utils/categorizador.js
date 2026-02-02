@@ -8,14 +8,28 @@ class Categorizador {
   }
 
   entrenar() {
+    /*console.log('Entrenando clasificador Naive Bayes...');*/
+    
+    let totalPatrones = 0;
     Object.keys(trainingData).forEach(categoria => {
       trainingData[categoria].forEach(palabra => {
         this.classifier.addDocument(palabra.toLowerCase(), categoria);
+        totalPatrones++;
       });
     });
     
     this.classifier.train();
-    console.log('✓ Categorizador entrenado con', this.contarPatrones(), 'patrones');
+    /*console.log(`Categorizador entrenado con ${totalPatrones} patrones en ${Object.keys(trainingData).length} categorías`);*/
+    
+    // Test rápido
+    const testCases = ['tottus', 'metro', 'wong', 'uber', 'taxi', 'netflix', 'jabon', 'shampoo'];
+    testCases.forEach(test => {
+      const resultado = this.categorizar(test);
+      const clasificaciones = this.classifier.getClassifications(test);
+      const confianza = clasificaciones[0]?.value || 0;
+      console.log(`"${test}" → ${resultado} (${(confianza * 100).toFixed(1)}%)`);
+    });
+    /*console.log('===================\n');*/
   }
 
   contarPatrones() {
@@ -28,16 +42,14 @@ class Categorizador {
     }
 
     const texto = descripcion.toLowerCase().trim();
-    const categoria = this.classifier.classify(texto);
     const clasificaciones = this.classifier.getClassifications(texto);
     
-    const confianza = clasificaciones[0]?.value || 0;
-
-    if (confianza < 0.4) {
-      return 'Otros';
+    // Siempre tomar la primera sugerencia (la más probable)
+    if (clasificaciones && clasificaciones.length > 0) {
+      return clasificaciones[0].label;
     }
 
-    return categoria;
+    return 'Otros';
   }
 
   obtenerConfianza(descripcion) {

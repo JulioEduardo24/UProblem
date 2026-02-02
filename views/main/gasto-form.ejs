@@ -107,7 +107,7 @@
 
                 <div class="form-group">
                     <label for="categoria">Categoría *</label>
-                    <select id="categoria" name="categoria" required>
+                    <select id="categoria" name="categoria">
                         <option value="">Seleccionar categoría</option>
                         <% categorias.forEach(cat => { %>
                             <option value="<%= cat %>" <%= (gasto && gasto.categoria === cat) ? 'selected' : '' %>>
