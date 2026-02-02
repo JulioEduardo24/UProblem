@@ -61,6 +61,9 @@ body {
     margin-bottom: 40px;
     transition: background-color 0.3s ease;
     border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .navbar .container {
@@ -703,6 +706,53 @@ body {
     box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.06);
 }
 
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus,
+[data-theme="dark"] .form-group textarea:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
+.form-group input[type="date"] {
+    position: relative;
+    line-height: 1.5;
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit {
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-text {
+    padding: 0 0.3em;
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-month-field,
+.form-group input[type="date"]::-webkit-datetime-edit-day-field,
+.form-group input[type="date"]::-webkit-datetime-edit-year-field {
+    padding: 0;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 14px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+[data-theme="dark"] .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
 .form-group small {
     display: block;
     margin-top: 6px;
@@ -805,46 +855,309 @@ body {
 
 @media (max-width: 768px) {
     .container {
-        padding: 0 20px;
+        padding: 0 16px;
+    }
+    
+    .navbar {
+        padding: 12px 0;
+        margin-bottom: 24px;
     }
     
     .navbar .container {
         flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .navbar h1 {
+        font-size: 20px;
     }
     
     .nav-menu {
         width: 100%;
-        justify-content: space-between;
-        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr auto auto;
+        gap: 8px;
+    }
+    
+    .nav-link {
+        font-size: 13px;
+        padding: 10px 14px;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    .user-name {
+        display: none;
+    }
+    
+    .btn-icon {
+        padding: 10px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .btn-secondary {
+        padding: 10px 16px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    
+    .dashboard-welcome {
+        padding: 24px 20px;
+        margin-bottom: 24px;
+    }
+    
+    .dashboard-welcome h2 {
+        font-size: 24px;
+    }
+    
+    .dashboard-welcome p {
+        font-size: 14px;
+    }
+    
+    .dashboard-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .dashboard-actions .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 15px;
+        min-height: 48px;
     }
     
     .page-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .page-header h2 {
+        font-size: 24px;
+    }
+    
+    .page-subtitle {
+        font-size: 14px;
+    }
+    
+    .page-header .btn-primary {
+        width: 100%;
+        justify-content: center;
+        min-height: 48px;
+    }
+    
+    .filters-card {
+        padding: 20px;
     }
     
     .filters-form {
         grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .filters-form .btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 48px;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+    }
+    
+    .gastos-list {
+        gap: 12px;
+    }
+    
+    .gasto-card {
+        padding: 20px;
+    }
+    
+    .gasto-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .gasto-monto {
+        font-size: 24px;
+        align-self: flex-start;
+    }
+    
+    .gasto-details {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .gasto-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
     }
     
     .form-row {
         grid-template-columns: 1fr;
     }
     
-    .gasto-header {
-        flex-direction: column;
-    }
-    
-    .gasto-monto {
-        font-size: 24px;
-    }
-    
     .form-actions {
-        flex-direction: column;
+        flex-direction: column-reverse;
     }
     
     .form-actions .btn {
         width: 100%;
         justify-content: center;
+        min-height: 48px;
+    }
+    
+    .gasto-form {
+        padding: 24px 20px;
+    }
+    
+    .form-header {
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    
+    .form-header h2 {
+        font-size: 22px;
+    }
+    
+    .empty-state {
+        padding: 48px 24px;
+    }
+    
+    .empty-state h3 {
+        font-size: 18px;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        min-height: 52px;
+        font-size: 16px;
+    }
+    
+    .form-group input[type="date"] {
+        min-height: 52px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        padding-right: 48px;
+    }
+    
+    .form-group input[type="date"]::-webkit-datetime-edit {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
+    
+    .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+        right: 14px;
+        width: 24px;
+        height: 24px;
+    }
+    
+    .form-group input[type="number"] {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar h1 {
+        font-size: 18px;
+    }
+    
+    .nav-link {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    
+    .btn-icon {
+        padding: 8px;
+    }
+    
+    .dashboard-welcome h2 {
+        font-size: 20px;
+    }
+    
+    .dashboard-welcome p {
+        font-size: 13px;
+    }
+    
+    .page-header h2 {
+        font-size: 20px;
+    }
+    
+    .gasto-descripcion {
+        font-size: 16px;
+    }
+    
+    .gasto-monto {
+        font-size: 22px;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+    }
+}
+
+.form-group input[type="date"] {
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.form-group input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+    min-height: 1.5em;
+}
+
+.gasto-form {
+    position: relative;
+    overflow: visible;
+}
+
+@media (max-width: 768px) {
+    /* Estilo específico para iOS */
+    .form-group input[type="date"] {
+        padding: 14px 18px;
+        height: 52px;
+        line-height: normal;
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    .form-container {
+        overflow: visible;
+    }
+    
+    body {
+        overflow-x: hidden;
+    }
+    
+    .form-group input[type="date"]:focus {
+        position: relative;
+        z-index: 1000;
     }
 }
