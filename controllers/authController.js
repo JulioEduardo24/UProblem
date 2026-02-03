@@ -1,5 +1,8 @@
 const Auth = require('../models/Auth');
 const jwt = require('jsonwebtoken');
+const Gasto = require('../models/Gasto');
+const Presupuesto = require('../models/Presupuesto');
+
 
 exports.showRegister = (req, res) => {
   res.render('auth/register', { error: null });
@@ -155,12 +158,94 @@ exports.logout = (req, res) => {
 exports.showDashboard = async (req, res) => {
   try {
     const user = await Auth.findById(req.userId);
-    res.render('main/dashboard', { user });
+    
+    // Obtener fecha actual
+    const hoy = new Date();
+    const mes = hoy.getMonth() + 1;
+    const anio = hoy.getFullYear();
+
+    // Obtener total gastado del mes
+    const totalMensual = await Gasto.obtenerTotalMensual(req.userId, mes, anio);
+
+    // Obtener resumen por categoría
+    const resumenCategorias = await Gasto.obtenerResumenPorCategoria(req.userId, mes, anio);
+
+    // Obtener presupuesto actual
+    const presupuestoActual = await Presupuesto.obtenerActual(req.userId, mes, anio);
+    
+    let progresoPresupuesto = null;
+    if (presupuestoActual) {
+      progresoPresupuesto = await Presupuesto.calcularProgreso(req.userId, mes, anio);
+    }
+
+    // Obtener gastos recientes (últimos 10)
+    const gastosRecientes = await Gasto.obtenerPorUsuario(req.userId, {});
+    const ultimos10 = gastosRecientes.slice(0, 10);
+
+    // Calcular estadísticas
+    const estadisticas = {
+      totalMensual,
+      presupuesto: presupuestoActual ? parseFloat(presupuestoActual.monto_total) : 0,
+      porcentajeGastado: presupuestoActual ? (totalMensual / parseFloat(presupuestoActual.monto_total)) * 100 : 0,
+      ahorro: presupuestoActual ? parseFloat(presupuestoActual.monto_total) - totalMensual : 0,
+      categoriaConMasGasto: obtenerCategoriaConMasGasto(resumenCategorias),
+      totalGastos: gastosRecientes.length
+    };
+
+    // Preparar datos para gráficos
+    const datosGraficos = {
+      categorias: Object.keys(resumenCategorias),
+      montos: Object.values(resumenCategorias),
+      colores: obtenerColoresCategorias(Object.keys(resumenCategorias))
+    };
+
+    res.render('main/dashboard', {
+      user,
+      estadisticas,
+      resumenCategorias,
+      datosGraficos,
+      progresoPresupuesto,
+      presupuestoActual,
+      ultimos10,
+      mes,
+      anio
+    });
   } catch (error) {
     console.error('Error al cargar dashboard:', error);
     res.redirect('/auth/login');
   }
 };
+
+function obtenerCategoriaConMasGasto(resumen) {
+  if (Object.keys(resumen).length === 0) return 'N/A';
+  
+  let maxCategoria = '';
+  let maxMonto = 0;
+  
+  Object.entries(resumen).forEach(([categoria, monto]) => {
+    if (monto > maxMonto) {
+      maxMonto = monto;
+      maxCategoria = categoria;
+    }
+  });
+  
+  return maxCategoria;
+}
+
+function obtenerColoresCategorias(categorias) {
+  const coloresMap = {
+    'Alimentación': '#10b981',
+    'Transporte': '#3b82f6',
+    'Vivienda': '#f59e0b',
+    'Salud': '#ec4899',
+    'Entretenimiento': '#8b5cf6',
+    'Educación': '#06b6d4',
+    'Ropa y Cuidado Personal': '#f43f5e',
+    'Otros': '#6b7280'
+  };
+  
+  return categorias.map(cat => coloresMap[cat] || '#6b7280');
+}
 
 exports.toggleTheme = async (req, res) => {
   try {

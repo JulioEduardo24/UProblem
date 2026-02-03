@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="<%= user.tema_preferido || 'light' %>">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - UProblem</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
-
 <body>
     <nav class="navbar">
         <div class="container">
-            <div class="navbar-brand">
-                <h1>UProblem</h1>
-            </div>
+            <h1>UProblem</h1>
             <div class="nav-menu">
-                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/dashboard" class="nav-link active">Dashboard</a>
                 <a href="/gastos" class="nav-link">Gastos</a>
-                <span class="user-name">Hola, <%= user.nombres %></span>
-                <button id="themeToggle" class="btn-icon" title="Cambiar tema" aria-label="Cambiar tema">
-                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor">
+                <a href="/presupuestos" class="nav-link">Presupuestos</a>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -31,21 +27,26 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor">
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
-                <a href="/auth/logout" class="btn btn-secondary">Salir</a>
+                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
             </div>
         </div>
     </nav>
 
     <div class="container">
         <div class="dashboard-welcome">
-            <h2>Bienvenido a UProblem</h2>
-            <p>Sistema de gestión de gastos personales con recomendaciones inteligentes</p>
+            <h2>Bienvenido, <%= user.nombres %></h2>
+            <p>Resumen de <%= ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][mes - 1] %> <%= anio %></p>
         </div>
+
+        <% if (progresoPresupuesto && progresoPresupuesto.alertaGeneral) { %>
+            <div class="alert alert-warning">
+                ⚠️ <strong>Alerta de Presupuesto:</strong> Has gastado el <%= progresoPresupuesto.porcentajeGastado.toFixed(1) %>% de tu presupuesto mensual.
+            </div>
+        <% } %>
 
         <div class="dashboard-actions">
             <a href="/gastos/nuevo" class="btn btn-primary">
@@ -55,35 +56,136 @@
                 </svg>
                 Registrar Gasto
             </a>
-            <a href="/gastos" class="btn btn-outline">Ver todos los gastos</a>
+            <% if (!presupuestoActual) { %>
+                <a href="/presupuestos/nuevo" class="btn btn-outline">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    Crear Presupuesto
+                </a>
+            <% } %>
         </div>
 
         <div class="dashboard-stats">
             <div class="stat-card">
                 <h3>Total Gastado</h3>
-                <p class="stat-value">S/ 0.00</p>
+                <p class="stat-value">S/ <%= estadisticas.totalMensual.toFixed(2) %></p>
                 <span class="stat-label">Este mes</span>
             </div>
 
             <div class="stat-card">
                 <h3>Presupuesto</h3>
-                <p class="stat-value">S/ 0.00</p>
+                <p class="stat-value">S/ <%= estadisticas.presupuesto.toFixed(2) %></p>
                 <span class="stat-label">Mensual</span>
+                <% if (estadisticas.presupuesto === 0) { %>
+                    <a href="/presupuestos/nuevo" class="stat-link">Definir presupuesto</a>
+                <% } %>
             </div>
 
             <div class="stat-card">
                 <h3>Ahorro</h3>
-                <p class="stat-value">0%</p>
-                <span class="stat-label">Del presupuesto</span>
+                <p class="stat-value <%= estadisticas.ahorro < 0 ? 'text-danger' : '' %>">
+                    S/ <%= estadisticas.ahorro.toFixed(2) %>
+                </p>
+                <span class="stat-label">
+                    <%= estadisticas.presupuesto > 0 ? (100 - estadisticas.porcentajeGastado).toFixed(1) + '% restante' : 'Sin presupuesto' %>
+                </span>
+            </div>
+
+            <div class="stat-card">
+                <h3>Categoría Principal</h3>
+                <p class="stat-value" style="font-size: 20px;"><%= estadisticas.categoriaConMasGasto %></p>
+                <span class="stat-label">Mayor gasto</span>
             </div>
         </div>
 
-        <div class="dashboard-info">
-            <p>✨ Sistema con categorización automática mediante IA</p>
-        </div>
+        <% if (Object.keys(resumenCategorias).length > 0) { %>
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3>Gastos por Categoría</h3>
+                    <div class="chart-container">
+                        <canvas id="categoriasChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Distribución del Gasto</h3>
+                    <div class="chart-container">
+                        <canvas id="donutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <% if (presupuestoActual && progresoPresupuesto) { %>
+                <div class="chart-card-full">
+                    <h3>Progreso del Presupuesto</h3>
+                    <div class="chart-container-horizontal">
+                        <canvas id="presupuestoChart"></canvas>
+                    </div>
+                </div>
+            <% } %>
+        <% } %>
+
+        <% if (ultimos10.length > 0) { %>
+            <div class="gastos-recientes-section">
+                <div class="section-header">
+                    <h3>Gastos Recientes</h3>
+                    <a href="/gastos" class="btn btn-outline btn-sm">Ver todos</a>
+                </div>
+                <div class="gastos-recientes-list">
+                    <% ultimos10.forEach(gasto => { %>
+                        <div class="gasto-reciente-item">
+                            <div class="gasto-reciente-info">
+                                <span class="gasto-reciente-desc"><%= gasto.descripcion %></span>
+                                <span class="gasto-reciente-cat categoria-<%= gasto.categoria.toLowerCase().replace(/\s+/g, '-') %>">
+                                    <%= gasto.categoria %>
+                                </span>
+                            </div>
+                            <div class="gasto-reciente-monto">
+                                <span class="monto-valor">S/ <%= parseFloat(gasto.monto).toFixed(2) %></span>
+                                <span class="monto-fecha">
+                                    <%= new Date(gasto.fecha).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }) %>
+                                </span>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="dashboard-info">
+                <p>✨ Comienza registrando tu primer gasto para ver estadísticas y gráficos</p>
+            </div>
+        <% } %>
     </div>
 
-    <script src="/js/theme.js"></script>
-</body>
+   <script>
+        // Verificar si hay datos para graficar
+        const tieneDatos = <%= Object.keys(resumenCategorias).length > 0 ? 'true' : 'false' %>;
+        
+        // Datos para los gráficos
+        const datosGraficos = tieneDatos ? <%- JSON.stringify({
+            categorias: datosGraficos.categorias,
+            montos: datosGraficos.montos,
+            colores: datosGraficos.colores
+        }) %> : { categorias: [], montos: [], colores: [] };
 
+        // Datos del presupuesto (si existe)
+        <% if (typeof presupuestoActual !== 'undefined' && presupuestoActual && typeof progresoPresupuesto !== 'undefined' && progresoPresupuesto && Array.isArray(progresoPresupuesto.categorias)) { %>
+        const progresoPresupuesto = <%- JSON.stringify({
+            categorias: progresoPresupuesto.categorias
+        }) %>;
+        <% } else { %>
+        const progresoPresupuesto = null;
+        <% } %>
+        
+        console.log('Dashboard cargado');
+        console.log('Tiene datos:', tieneDatos);
+        console.log('Datos gráficos:', datosGraficos);
+        console.log('Progreso presupuesto:', progresoPresupuesto);
+    </script>
+    <script src="/js/theme.js"></script>
+    <script src="/js/dashboard-charts.js"></script>
+</body>
 </html>

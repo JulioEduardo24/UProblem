@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuestos - UProblem</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>UProblem</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/gastos" class="nav-link">Gastos</a>
+                <a href="/presupuestos" class="nav-link active">Presupuestos</a>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h2>Mis Presupuestos</h2>
+                <p class="page-subtitle">Gestiona tus presupuestos mensuales</p>
+            </div>
+            <% if (!presupuestoActual) { %>
+                <a href="/presupuestos/nuevo" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Crear Presupuesto del Mes
+                </a>
+            <% } %>
+        </div>
+
+        <% if (typeof req !== 'undefined' && typeof req.query !== 'undefined') { %>
+            <% if (req.query.success === 'created') { %>
+                <div class="alert alert-success">✓ Presupuesto creado exitosamente</div>
+            <% } else if (req.query.success === 'updated') { %>
+                <div class="alert alert-success">✓ Presupuesto actualizado exitosamente</div>
+            <% } else if (req.query.success === 'deleted') { %>
+                <div class="alert alert-success">✓ Presupuesto eliminado exitosamente</div>
+            <% } else if (req.query.error === 'invalid') { %>
+                <div class="alert alert-error">✗ Datos inválidos</div>
+            <% } else if (req.query.error === 'percentage') { %>
+                <div class="alert alert-error">✗ La suma de porcentajes no puede exceder 100%</div>
+            <% } %>
+        <% } %>
+
+        <% if (progreso) { %>
+            <div class="presupuesto-actual-card">
+                <div class="presupuesto-header">
+                    <div>
+                        <h3>Presupuesto Actual</h3>
+                        <p class="presupuesto-periodo">
+                            <%= ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][mesActual - 1] %> <%= anioActual %>
+                        </p>
+                    </div>
+                    <div class="presupuesto-actions-mini">
+                        <a href="/presupuestos/editar/<%= presupuestoActual.id %>" class="btn-icon-mini">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="presupuesto-resumen">
+                    <div class="resumen-item">
+                        <span class="resumen-label">Presupuesto Total</span>
+                        <span class="resumen-valor">S/ <%= progreso.totalPresupuesto.toFixed(2) %></span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Total Gastado</span>
+                        <span class="resumen-valor <%= progreso.alertaGeneral ? 'text-danger' : '' %>">
+                            S/ <%= progreso.totalGastado.toFixed(2) %>
+                        </span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Restante</span>
+                        <span class="resumen-valor <%= progreso.restante < 0 ? 'text-danger' : 'text-success' %>">
+                            S/ <%= progreso.restante.toFixed(2) %>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill <%= progreso.porcentajeGastado >= 100 ? 'progress-danger' : progreso.porcentajeGastado >= 80 ? 'progress-warning' : 'progress-success' %>" 
+                             style="width: <%= Math.min(progreso.porcentajeGastado, 100) %>%">
+                        </div>
+                    </div>
+                    <span class="progress-label"><%= progreso.porcentajeGastado.toFixed(1) %>% gastado</span>
+                </div>
+
+                <% if (progreso.alertaGeneral) { %>
+                    <div class="alert alert-warning">
+                        ⚠️ Has gastado más del 80% de tu presupuesto mensual
+                    </div>
+                <% } %>
+
+                <% if (progreso.categorias && progreso.categorias.length > 0) { %>
+                    <div class="categorias-progreso">
+                        <h4>Progreso por Categoría</h4>
+                        <div class="categorias-grid">
+                            <% progreso.categorias.forEach(cat => { %>
+                                <div class="categoria-progreso-card">
+                                    <div class="categoria-progreso-header">
+                                        <span class="categoria-nombre"><%= cat.categoria %></span>
+                                        <span class="categoria-porcentaje"><%= cat.porcentaje %>%</span>
+                                    </div>
+                                    <div class="categoria-montos">
+                                        <span class="monto-gastado">S/ <%= cat.gastado.toFixed(2) %></span>
+                                        <span class="monto-separador">/</span>
+                                        <span class="monto-presupuesto">S/ <%= cat.presupuesto.toFixed(2) %></span>
+                                    </div>
+                                    <div class="progress-bar-mini">
+                                        <div class="progress-fill-mini <%= cat.porcentajeGastado >= 100 ? 'progress-danger' : cat.alerta ? 'progress-warning' : 'progress-success' %>" 
+                                             style="width: <%= Math.min(cat.porcentajeGastado, 100) %>%;">
+                                        </div>
+                                    </div>
+                                    <span class="progress-label-mini"><%= cat.porcentajeGastado.toFixed(0) %>%</span>
+                                    <% if (cat.alerta) { %>
+                                        <span class="alerta-badge">⚠️ Alerta</span>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h3>No tienes un presupuesto para este mes</h3>
+                <p>Crea tu primer presupuesto para comenzar a controlar tus gastos</p>
+                <a href="/presupuestos/nuevo" class="btn btn-primary">Crear Presupuesto</a>
+            </div>
+        <% } %>
+
+        <% if (presupuestos.length > 0) { %>
+            <div class="historial-presupuestos">
+                <h3>Historial de Presupuestos</h3>
+                <div class="presupuestos-list">
+                    <% presupuestos.forEach(p => { %>
+                        <div class="presupuesto-card-mini">
+                            <div class="presupuesto-info">
+                                <h4>
+                                    <%= ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][p.mes - 1] %> <%= p.anio %>
+                                </h4>
+                                <p>Presupuesto: S/ <%= parseFloat(p.monto_total).toFixed(2) %></p>
+                                <% if (p.presupuesto_categorias && p.presupuesto_categorias.length > 0) { %>
+                                    <p class="categorias-count"><%= p.presupuesto_categorias.length %> categorías asignadas</p>
+                                <% } %>
+                            </div>
+                            <div class="presupuesto-actions">
+                                <a href="/presupuestos/editar/<%= p.id %>" class="btn-action btn-edit">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Editar
+                                </a>
+                                <form method="POST" action="/presupuestos/eliminar/<%= p.id %>" style="display: inline;" onsubmit="return confirm('¿Eliminar este presupuesto?')">
+                                    <button type="submit" class="btn-action btn-delete">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <script src="/js/theme.js"></script>
+</body>
+</html>

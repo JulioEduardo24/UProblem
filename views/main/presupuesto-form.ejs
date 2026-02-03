@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= presupuesto ? 'Editar' : 'Nuevo' %> Presupuesto - UProblem</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>UProblem</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/gastos" class="nav-link">Gastos</a>
+                <a href="/presupuestos" class="nav-link active">Presupuestos</a>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <a href="/presupuestos" class="btn-back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Volver
+                </a>
+                <h2><%= presupuesto ? 'Editar' : 'Nuevo' %> Presupuesto</h2>
+            </div>
+
+            <% if (error) { %>
+                <div class="alert alert-error">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <form method="POST" action="<%= presupuesto ? `/presupuestos/editar/${presupuesto.id}` : '/presupuestos/nuevo' %>" class="presupuesto-form" id="presupuestoForm">
+                <% if (!presupuesto) { %>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mes">Mes *</label>
+                            <select id="mes" name="mes" required>
+                                <option value="">Seleccionar mes</option>
+                                <% for(let i = 1; i <= 12; i++) { %>
+                                    <option value="<%= i %>" <%= (presupuesto ? presupuesto.mes === i : mesActual === i) ? 'selected' : '' %>>
+                                        <%= ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][i - 1] %>
+                                    </option>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="anio">Año *</label>
+                            <select id="anio" name="anio" required>
+                                <% for(let y = anioActual - 1; y <= anioActual + 1; y++) { %>
+                                    <option value="<%= y %>" <%= (presupuesto ? presupuesto.anio === y : anioActual === y) ? 'selected' : '' %>>
+                                        <%= y %>
+                                    </option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="info-box">
+                        <strong>Período:</strong> 
+                        <%= ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][presupuesto.mes - 1] %> <%= presupuesto.anio %>
+                    </div>
+                <% } %>
+
+                <div class="form-group">
+                    <label for="monto_total">Presupuesto Total Mensual (S/) *</label>
+                    <input 
+                        type="number" 
+                        id="monto_total" 
+                        name="monto_total" 
+                        step="0.01" 
+                        min="1"
+                        placeholder="1000.00"
+                        value="<%= presupuesto ? presupuesto.monto_total : '' %>"
+                        required
+                    >
+                    <small>Ingresa el monto total que planeas gastar este mes</small>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3>Distribución por Categorías (Opcional)</h3>
+                        <p>Asigna porcentajes a cada categoría. Puedes dejarlo vacío si no quieres detallar.</p>
+                    </div>
+
+                    <div class="categorias-distribucion" id="categoriasDistribucion">
+                        <% categorias.forEach((cat, index) => { 
+                            const catData = presupuesto && presupuesto.presupuesto_categorias ? 
+                                presupuesto.presupuesto_categorias.find(c => c.categoria === cat) : null;
+                        %>
+                            <div class="categoria-input-row">
+                                <label class="categoria-label"><%= cat %></label>
+                                <div class="input-group">
+                                    <input 
+                                        type="number" 
+                                        class="categoria-porcentaje" 
+                                        data-categoria="<%= cat %>"
+                                        min="0" 
+                                        max="100" 
+                                        step="1"
+                                        placeholder="0"
+                                        value="<%= catData ? catData.porcentaje : '' %>"
+                                    >
+                                    <span class="input-suffix">%</span>
+                                    <span class="monto-calculado" data-categoria="<%= cat %>">S/ 0.00</span>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+
+                    <div class="distribucion-resumen">
+                        <div class="resumen-row">
+                            <span>Total asignado:</span>
+                            <strong id="totalPorcentaje">0%</strong>
+                        </div>
+                        <div class="resumen-row">
+                            <span>Sin asignar:</span>
+                            <strong id="sinAsignar">100%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" name="categorias_json" id="categorias_json">
+
+                <div class="form-actions">
+                    <a href="/presupuestos" class="btn btn-outline">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">
+                        <%= presupuesto ? 'Guardar Cambios' : 'Crear Presupuesto' %>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/presupuesto-form.js"></script>
+</body>
+</html>
