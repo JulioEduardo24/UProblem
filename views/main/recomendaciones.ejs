@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - UProblem</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header">
+                <h1>UProblem</h1>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <svg class="close-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/dashboard" class="nav-link ">Dashboard</a>
+                <a href="/gastos" class="nav-link">Gastos</a>
+                <a href="/presupuestos" class="nav-link">Presupuestos</a>
+                <a href="/recomendaciones" class="nav-link active">Recomendaciones</a>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="/auth/logout" class="btn btn-secondary">Salir</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h2>Recomendaciones Inteligentes</h2>
+                <p class="page-subtitle">
+                    <%= ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][mes - 1] %> <%= anio %>
+                </p>
+            </div>
+        </div>
+
+        <% if (stats.total === 0) { %>
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3>¡Todo bajo control!</h3>
+                <p>No hay recomendaciones críticas en este momento. Sigue así.</p>
+                <a href="/gastos" class="btn btn-primary">Ver mis gastos</a>
+            </div>
+        <% } else { %>
+            <!-- Estadísticas de recomendaciones -->
+            <div class="recomendaciones-stats">
+                <div class="stat-badge stat-total">
+                    <span class="stat-numero"><%= stats.total %></span>
+                    <span class="stat-etiqueta">Total</span>
+                </div>
+                <% if (stats.alertas > 0) { %>
+                <div class="stat-badge stat-alertas">
+                    <span class="stat-numero"><%= stats.alertas %></span>
+                    <span class="stat-etiqueta">Alertas</span>
+                </div>
+                <% } %>
+                <% if (stats.sugerencias > 0) { %>
+                <div class="stat-badge stat-sugerencias">
+                    <span class="stat-numero"><%= stats.sugerencias %></span>
+                    <span class="stat-etiqueta">Ahorros</span>
+                </div>
+                <% } %>
+                <% if (stats.patrones > 0) { %>
+                <div class="stat-badge stat-patrones">
+                    <span class="stat-numero"><%= stats.patrones %></span>
+                    <span class="stat-etiqueta">Patrones</span>
+                </div>
+                <% } %>
+                <% if (stats.logros > 0) { %>
+                <div class="stat-badge stat-logros">
+                    <span class="stat-numero"><%= stats.logros %></span>
+                    <span class="stat-etiqueta">Logros</span>
+                </div>
+                <% } %>
+            </div>
+
+            <!-- Recomendaciones críticas -->
+            <% if (agrupadas.criticas.length > 0) { %>
+                <div class="recomendaciones-seccion">
+                    <h3 class="seccion-titulo seccion-critico">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        Críticas (<%= agrupadas.criticas.length %>)
+                    </h3>
+                    <div class="recomendaciones-lista">
+                        <% agrupadas.criticas.forEach(rec => { %>
+                            <%- include('../partials/recomendacion-card', { rec }) %>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Recomendaciones altas -->
+            <% if (agrupadas.altas.length > 0) { %>
+                <div class="recomendaciones-seccion">
+                    <h3 class="seccion-titulo seccion-alta">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Importantes (<%= agrupadas.altas.length %>)
+                    </h3>
+                    <div class="recomendaciones-lista">
+                        <% agrupadas.altas.forEach(rec => { %>
+                            <%- include('../partials/recomendacion-card', { rec }) %>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Recomendaciones medias -->
+            <% if (agrupadas.medias.length > 0) { %>
+                <div class="recomendaciones-seccion">
+                    <h3 class="seccion-titulo seccion-media">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 16v-4"></path>
+                            <path d="M12 8h.01"></path>
+                        </svg>
+                        Sugerencias (<%= agrupadas.medias.length %>)
+                    </h3>
+                    <div class="recomendaciones-lista">
+                        <% agrupadas.medias.forEach(rec => { %>
+                            <%- include('../partials/recomendacion-card', { rec }) %>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Recomendaciones informativas -->
+            <% if (agrupadas.informativas.length > 0) { %>
+                <div class="recomendaciones-seccion">
+                    <h3 class="seccion-titulo seccion-info">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Información útil (<%= agrupadas.informativas.length %>)
+                    </h3>
+                    <div class="recomendaciones-lista">
+                        <% agrupadas.informativas.forEach(rec => { %>
+                            <%- include('../partials/recomendacion-card', { rec }) %>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+        <% } %>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/navbar.js"></script>
+</body>
+</html>

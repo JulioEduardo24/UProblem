@@ -3,17 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presupuestos - UProblem</title>
+    <title>Dashboard - UProblem</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
-            <h1>UProblem</h1>
-            <div class="nav-menu">
-                <a href="/dashboard" class="nav-link">Dashboard</a>
+            <div class="navbar-header">
+                <h1>UProblem</h1>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <svg class="close-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/dashboard" class="nav-link ">Dashboard</a>
                 <a href="/gastos" class="nav-link">Gastos</a>
                 <a href="/presupuestos" class="nav-link active">Presupuestos</a>
+                <a href="/recomendaciones" class="nav-link">Recomendaciones</a>
                 <button id="themeToggle" class="btn-icon" title="Cambiar tema">
                     <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -30,7 +45,7 @@
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
-                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+                <a href="/auth/logout" class="btn btn-secondary">Salir</a>
             </div>
         </div>
     </nav>
@@ -203,5 +218,6 @@
     </div>
 
     <script src="/js/theme.js"></script>
+    <script src="/js/navbar.js"></script>
 </body>
 </html>

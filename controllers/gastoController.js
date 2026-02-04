@@ -1,4 +1,7 @@
 const Gasto = require('../models/Gasto');
+const Presupuesto = require('../models/Presupuesto');
+const Exportador = require('../utils/exportador');
+const Auth = require('../models/Auth');
 
 const CATEGORIAS = [
   'Alimentación',
@@ -13,33 +16,58 @@ const CATEGORIAS = [
 
 exports.mostrarGastos = async (req, res) => {
   try {
-    const { categoria, fechaInicio, fechaFin } = req.query;
+    const { categoria, desde, hasta } = req.query;
     
-    const gastos = await Gasto.obtenerPorUsuario(req.userId, {
-      categoria,
-      fechaInicio,
-      fechaFin
-    });
+    // Construir filtros
+    const filtros = {};
+    
+    if (categoria && categoria !== '') {
+      filtros.categoria = categoria;
+    }
+    
+    if (desde) {
+      filtros.desde = desde;
+    }
+    
+    if (hasta) {
+      filtros.hasta = hasta;
+    }
 
+    // Obtener gastos
+    const gastos = await Gasto.obtenerPorUsuario(req.userId, filtros);
+
+    // Obtener total mensual
     const hoy = new Date();
-    const totalMensual = await Gasto.obtenerTotalMensual(
-      req.userId, 
-      hoy.getMonth() + 1, 
-      hoy.getFullYear()
-    );
+    const mes = hoy.getMonth() + 1;
+    const anio = hoy.getFullYear();
+    const totalMensual = await Gasto.obtenerTotalMensual(req.userId, mes, anio);
+
+    // Categorías disponibles
+    const categorias = [
+      'Alimentación',
+      'Transporte',
+      'Vivienda',
+      'Salud',
+      'Entretenimiento',
+      'Educación',
+      'Ropa y Cuidado Personal',
+      'Otros'
+    ];
 
     res.render('main/gastos', {
       gastos,
-      categorias: CATEGORIAS,
-      filtros: { categoria, fechaInicio, fechaFin },
-      totalMensual
+      categorias,
+      totalMensual,
+      categoria: categoria || '', // <-- ESTO ES LO IMPORTANTE
+      desde: desde || '',
+      hasta: hasta || '',
+      req
     });
   } catch (error) {
-    console.error('Error al cargar gastos:', error);
-    res.status(500).send('Error al cargar gastos');
+    console.error('Error al obtener gastos:', error);
+    res.status(500).send('Error al cargar los gastos');
   }
 };
-
 exports.mostrarFormularioNuevo = (req, res) => {
   const hoy = new Date().toISOString().split('T')[0];
   res.render('main/gasto-form', {
@@ -171,5 +199,125 @@ exports.eliminar = async (req, res) => {
   } catch (error) {
     console.error('Error al eliminar gasto:', error);
     res.redirect('/gastos');
+  }
+};
+
+exports.exportarPDF = async (req, res) => {
+  try {
+    const { mes, anio, categoria } = req.query;
+    
+    // Obtener usuario
+    const user = await Auth.findById(req.userId);
+    
+    // Obtener gastos con filtros
+    const filtros = {};
+    if (mes) filtros.mes = parseInt(mes);
+    if (anio) filtros.anio = parseInt(anio);
+    if (categoria && categoria !== 'Todas') filtros.categoria = categoria;
+    
+    const gastos = await Gasto.obtenerPorUsuario(req.userId, filtros);
+    
+    if (gastos.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'No hay gastos para exportar con los filtros seleccionados' 
+      });
+    }
+
+    // Obtener mes y año para el reporte
+    const mesReporte = mes ? parseInt(mes) : new Date().getMonth() + 1;
+    const anioReporte = anio ? parseInt(anio) : new Date().getFullYear();
+
+    // Obtener resumen por categoría
+    const resumen = await Gasto.obtenerResumenPorCategoria(req.userId, mesReporte, anioReporte);
+    
+    // Obtener progreso del presupuesto
+    let progresoPresupuesto = null;
+    const presupuestoActual = await Presupuesto.obtenerActual(req.userId, mesReporte, anioReporte);
+    if (presupuestoActual) {
+      progresoPresupuesto = await Presupuesto.calcularProgreso(req.userId, mesReporte, anioReporte);
+    }
+
+    // Generar PDF
+    const pdfBuffer = await Exportador.exportarPDF(
+      user, 
+      gastos, 
+      resumen, 
+      mesReporte, 
+      anioReporte, 
+      progresoPresupuesto
+    );
+
+    // Enviar PDF
+    const nombreArchivo = `Gastos_${Exportador.obtenerNombreMes(mesReporte)}_${anioReporte}.pdf`;
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error al exportar PDF:', error);
+    res.status(500).json({ success: false, message: 'Error al generar el PDF' });
+  }
+};
+
+exports.exportarExcel = async (req, res) => {
+  try {
+    const { mes, anio, categoria } = req.query;
+    
+    // Obtener usuario
+    const user = await Auth.findById(req.userId);
+    
+    // Obtener gastos con filtros
+    const filtros = {};
+    if (mes) filtros.mes = parseInt(mes);
+    if (anio) filtros.anio = parseInt(anio);
+    if (categoria && categoria !== 'Todas') filtros.categoria = categoria;
+    
+    const gastos = await Gasto.obtenerPorUsuario(req.userId, filtros);
+    
+    if (gastos.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'No hay gastos para exportar con los filtros seleccionados' 
+      });
+    }
+
+    // Obtener mes y año para el reporte
+    const mesReporte = mes ? parseInt(mes) : new Date().getMonth() + 1;
+    const anioReporte = anio ? parseInt(anio) : new Date().getFullYear();
+
+    // Obtener resumen por categoría
+    const resumen = await Gasto.obtenerResumenPorCategoria(req.userId, mesReporte, anioReporte);
+    
+    // Obtener progreso del presupuesto
+    let progresoPresupuesto = null;
+    const presupuestoActual = await Presupuesto.obtenerActual(req.userId, mesReporte, anioReporte);
+    if (presupuestoActual) {
+      progresoPresupuesto = await Presupuesto.calcularProgreso(req.userId, mesReporte, anioReporte);
+    }
+
+    // Generar Excel
+    const excelBuffer = await Exportador.exportarExcel(
+      user, 
+      gastos, 
+      resumen, 
+      mesReporte, 
+      anioReporte, 
+      progresoPresupuesto
+    );
+
+    // Enviar Excel
+    const nombreArchivo = `Gastos_${Exportador.obtenerNombreMes(mesReporte)}_${anioReporte}.xlsx`;
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
+    res.setHeader('Content-Length', excelBuffer.length);
+    
+    res.send(excelBuffer);
+  } catch (error) {
+    console.error('Error al exportar Excel:', error);
+    res.status(500).json({ success: false, message: 'Error al generar el Excel' });
   }
 };

@@ -2,6 +2,7 @@ const Auth = require('../models/Auth');
 const jwt = require('jsonwebtoken');
 const Gasto = require('../models/Gasto');
 const Presupuesto = require('../models/Presupuesto');
+const Recomendacion = require('../models/Recomendacion');
 
 
 exports.showRegister = (req, res) => {
@@ -246,6 +247,74 @@ function obtenerColoresCategorias(categorias) {
   
   return categorias.map(cat => coloresMap[cat] || '#6b7280');
 }
+exports.showDashboard = async (req, res) => {
+  try {
+    const user = await Auth.findById(req.userId);
+    
+    // Obtener fecha actual
+    const hoy = new Date();
+    const mes = hoy.getMonth() + 1;
+    const anio = hoy.getFullYear();
+
+    // Obtener total gastado del mes
+    const totalMensual = await Gasto.obtenerTotalMensual(req.userId, mes, anio);
+
+    // Obtener resumen por categoría
+    const resumenCategorias = await Gasto.obtenerResumenPorCategoria(req.userId, mes, anio);
+
+    // Obtener presupuesto actual
+    const presupuestoActual = await Presupuesto.obtenerActual(req.userId, mes, anio);
+    
+    let progresoPresupuesto = null;
+    if (presupuestoActual) {
+      progresoPresupuesto = await Presupuesto.calcularProgreso(req.userId, mes, anio);
+    }
+
+    // Obtener gastos recientes (últimos 10)
+    const gastosRecientes = await Gasto.obtenerPorUsuario(req.userId, {});
+    const ultimos10 = gastosRecientes.slice(0, 10);
+
+    // Obtener recomendaciones
+    const recomendaciones = await Recomendacion.generarRecomendaciones(req.userId, mes, anio);
+    const recomendacionesImportantes = recomendaciones.filter(r => 
+      r.prioridad === 'critico' || r.prioridad === 'alto'
+    );
+
+    // Calcular estadísticas
+    const estadisticas = {
+      totalMensual,
+      presupuesto: presupuestoActual ? parseFloat(presupuestoActual.monto_total) : 0,
+      porcentajeGastado: presupuestoActual ? (totalMensual / parseFloat(presupuestoActual.monto_total)) * 100 : 0,
+      ahorro: presupuestoActual ? parseFloat(presupuestoActual.monto_total) - totalMensual : 0,
+      categoriaConMasGasto: obtenerCategoriaConMasGasto(resumenCategorias),
+      totalGastos: gastosRecientes.length
+    };
+
+    // Preparar datos para gráficos
+    const datosGraficos = {
+      categorias: Object.keys(resumenCategorias),
+      montos: Object.values(resumenCategorias),
+      colores: obtenerColoresCategorias(Object.keys(resumenCategorias))
+    };
+
+    res.render('main/dashboard', {
+      user,
+      estadisticas,
+      resumenCategorias,
+      datosGraficos,
+      progresoPresupuesto,
+      presupuestoActual,
+      ultimos10,
+      recomendaciones: recomendacionesImportantes,
+      totalRecomendaciones: recomendaciones.length,
+      mes,
+      anio
+    });
+  } catch (error) {
+    console.error('Error al cargar dashboard:', error);
+    res.redirect('/auth/login');
+  }
+};
 
 exports.toggleTheme = async (req, res) => {
   try {

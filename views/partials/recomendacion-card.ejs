@@ -1,0 +1,24 @@
+<div class="recomendacion-card recomendacion-<%= rec.prioridad %> recomendacion-tipo-<%= rec.tipo %>">
+    <div class="recomendacion-icono">
+        <%= rec.icono %>
+    </div>
+    <div class="recomendacion-contenido">
+        <div class="recomendacion-header">
+            <h4 class="recomendacion-titulo"><%= rec.titulo %></h4>
+            <% if (rec.categoria) { %>
+                <span class="recomendacion-categoria">
+                    <%= rec.categoria %>
+                </span>
+            <% } %>
+        </div>
+        <p class="recomendacion-descripcion"><%= rec.descripcion %></p>
+        <% if (rec.accion) { %>
+            <div class="recomendacion-accion">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+                <span><%= rec.accion %></span>
+            </div>
+        <% } %>
+    </div>
+</div>

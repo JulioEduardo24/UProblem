@@ -13,4 +13,8 @@ router.get('/editar/:id', gastoController.mostrarFormularioEditar);
 router.post('/editar/:id', gastoController.actualizar);
 router.post('/eliminar/:id', gastoController.eliminar);
 
+router.get('/exportar/pdf', gastoController.exportarPDF);
+router.get('/exportar/excel', gastoController.exportarExcel);
+
+
 module.exports = router;
