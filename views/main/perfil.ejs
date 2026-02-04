@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - UProblem</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header">
+                <h1>UProblem</h1>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <svg class="close-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/gastos" class="nav-link">Gastos</a>
+                <a href="/presupuestos" class="nav-link">Presupuestos</a>
+                <a href="/recomendaciones" class="nav-link">Recomendaciones</a>
+                <a href="/perfil" class="nav-link active">Perfil</a>
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h2>Mi Perfil</h2>
+                <p class="page-subtitle">Gestiona tu información personal</p>
+            </div>
+        </div>
+
+        <!-- Mensajes -->
+        <% if (typeof req !== 'undefined' && typeof req.query !== 'undefined') { %>
+            <% if (req.query.success === 'updated') { %>
+                <div class="alert alert-success">✓ Perfil actualizado exitosamente</div>
+            <% } else if (req.query.success === 'password_changed') { %>
+                <div class="alert alert-success">✓ Contraseña cambiada exitosamente</div>
+            <% } else if (req.query.error === 'correo_required') { %>
+                <div class="alert alert-error">✗ El correo electrónico es requerido</div>
+            <% } else if (req.query.error === 'correo_invalid') { %>
+                <div class="alert alert-error">✗ El formato del correo electrónico no es válido</div>
+            <% } else if (req.query.error === 'correo_exists') { %>
+                <div class="alert alert-error">✗ El correo electrónico ya está registrado</div>
+            <% } else if (req.query.error === 'telefono_invalid') { %>
+                <div class="alert alert-error">✗ El teléfono solo puede contener números</div>
+            <% } else if (req.query.error === 'incomplete_password') { %>
+                <div class="alert alert-error">✗ Completa todos los campos de contraseña</div>
+            <% } else if (req.query.error === 'password_mismatch') { %>
+                <div class="alert alert-error">✗ Las contraseñas no coinciden</div>
+            <% } else if (req.query.error === 'password_short') { %>
+                <div class="alert alert-error">✗ La contraseña debe tener al menos 6 caracteres</div>
+            <% } else if (req.query.error === 'wrong_password') { %>
+                <div class="alert alert-error">✗ La contraseña actual es incorrecta</div>
+            <% } else if (req.query.error === 'server') { %>
+                <div class="alert alert-error">✗ Error al actualizar. Intenta nuevamente</div>
+            <% } %>
+        <% } %>
+
+        <!-- Avatar y nombre -->
+        <div class="perfil-header">
+            <div class="perfil-avatar">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <div class="perfil-info">
+                <h3><%= usuario.nombres %> <%= usuario.apellidos %></h3>
+                <p>@<%= usuario.usuario %></p>
+                <p class="correo"><%= usuario.correo %></p>
+            </div>
+        </div>
+
+        <!-- Información de solo lectura -->
+        <div class="perfil-section">
+            <h3 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Información Personal
+            </h3>
+            
+            <div class="info-grid-readonly">
+                <div class="info-item-readonly">
+                    <label>Nombres</label>
+                    <p><%= usuario.nombres %></p>
+                </div>
+                <div class="info-item-readonly">
+                    <label>Apellidos</label>
+                    <p><%= usuario.apellidos %></p>
+                </div>
+                <div class="info-item-readonly">
+                    <label>Nombre de Usuario</label>
+                    <p>@<%= usuario.usuario %></p>
+                </div>
+                <div class="info-item-readonly">
+                    <label>Fecha de Nacimiento</label>
+                    <p><%= usuario.fecha_nacimiento ? new Date(usuario.fecha_nacimiento + 'T00:00:00').toLocaleDateString('es-PE', { timeZone: 'America/Lima' }) : 'No especificado' %></p>
+                </div>
+                <div class="info-item-readonly">
+                    <label>Sexo</label>
+                    <p><%= usuario.sexo ? (usuario.sexo.charAt(0).toUpperCase() + usuario.sexo.slice(1)) : 'No especificado' %></p>
+                </div>
+                <div class="info-item-readonly">
+                    <label>Tipo de Documento</label>
+                    <p><%= usuario.tipo_documento %></p>
+                </div>
+                <div class="info-item-readonly">
+                    <label>Número de Documento</label>
+                    <p><%= usuario.numero_documento %></p>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 6px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Esta información no se puede modificar. Si necesitas actualizar estos datos, contacta con soporte.
+            </div>
+        </div>
+
+        <!-- Formulario editable: solo correo y teléfono -->
+        <div class="perfil-section">
+            <h3 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Información Editable
+            </h3>
+            <form method="POST" action="/perfil/actualizar" class="perfil-form">
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico *</label>
+                    <input 
+                        type="email" 
+                        id="correo" 
+                        name="correo" 
+                        value="<%= usuario.correo %>"
+                        required
+                        placeholder="correo@ejemplo.com"
+                    >
+                    <small>Este correo se usará para iniciar sesión</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input 
+                        type="tel" 
+                        id="telefono" 
+                        name="telefono" 
+                        value="<%= usuario.telefono || '' %>"
+                        placeholder="987654321"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                    >
+                    <small>Solo números, sin espacios ni guiones</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Formulario de cambiar contraseña -->
+        <div class="perfil-section">
+            <h3 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Cambiar Contraseña
+            </h3>
+            <form method="POST" action="/perfil/cambiar-password" class="perfil-form">
+                <div class="form-group">
+                    <label for="password_actual">Contraseña Actual *</label>
+                    <input 
+                        type="password" 
+                        id="password_actual" 
+                        name="password_actual" 
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password_nueva">Nueva Contraseña *</label>
+                        <input 
+                            type="password" 
+                            id="password_nueva" 
+                            name="password_nueva" 
+                            minlength="6"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <small>Mínimo 6 caracteres</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password_confirmacion">Confirmar Contraseña *</label>
+                        <input 
+                            type="password" 
+                            id="password_confirmacion" 
+                            name="password_confirmacion" 
+                            minlength="6"
+                            required
+                            autocomplete="new-password"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/navbar.js"></script>
+    <script>
+        // Validación adicional en frontend para teléfono
+        const telefonoInput = document.getElementById('telefono');
+        if (telefonoInput) {
+            telefonoInput.addEventListener('input', function(e) {
+                // Remover cualquier caracter que no sea número
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+    </script>
+</body>
+</html>

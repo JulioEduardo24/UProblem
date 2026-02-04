@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 class Auth {
   static async createUser(userData) {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    
+
     const { data, error } = await supabase
       .from('usuarios')
       .insert([{
@@ -21,7 +21,7 @@ class Auth {
       }])
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -32,7 +32,7 @@ class Auth {
       .select('*')
       .or(`correo.eq.${identifier},usuario.eq.${identifier}`)
       .single();
-    
+
     if (error && error.code !== 'PGRST116') throw error;
     return data;
   }
@@ -43,7 +43,7 @@ class Auth {
       .select('*')
       .eq('correo', email)
       .single();
-    
+
     if (error && error.code !== 'PGRST116') throw error;
     return data;
   }
@@ -54,7 +54,7 @@ class Auth {
       .select('*')
       .eq('usuario', username)
       .single();
-    
+
     if (error && error.code !== 'PGRST116') throw error;
     return data;
   }
@@ -65,7 +65,7 @@ class Auth {
       .select('*')
       .eq('numero_documento', numero_documento)
       .single();
-    
+
     if (error && error.code !== 'PGRST116') throw error;
     return data;
   }
@@ -76,7 +76,7 @@ class Auth {
       .select('id, nombres, apellidos, fecha_nacimiento, sexo, usuario, correo, tipo_documento, numero_documento, telefono, tema_preferido, fecha_registro')
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -88,13 +88,51 @@ class Auth {
   static async updateTheme(userId, theme) {
     const { error } = await supabase
       .from('usuarios')
-      .update({ 
+      .update({
         tema_preferido: theme,
         updated_at: new Date().toISOString()
       })
       .eq('id', userId);
-    
+
     if (error) throw error;
+  }
+  static async actualizarPerfil(userId, datos) {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .update({
+        correo: datos.correo,
+        telefono: datos.telefono,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async actualizarPassword(userId, hashPassword) {
+    const { error } = await supabase
+      .from('usuarios')
+      .update({
+        password: hashPassword,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+
+    if (error) throw error;
+  }
+
+  static async findByIdWithPassword(id) {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 }
 

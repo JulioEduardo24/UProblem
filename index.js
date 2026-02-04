@@ -8,7 +8,7 @@ const mainRoutes = require('./routes/mainRoutes');
 const gastoRoutes = require('./routes/gastoRoutes');
 const presupuestoRoutes = require('./routes/presupuestoRoutes');
 const recomendacionRoutes = require('./routes/recomendacionRoutes');
-
+const usuarioRoutes = require('./routes/usuarioRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,7 +30,7 @@ app.use('/', mainRoutes);
 app.use('/gastos', gastoRoutes);
 app.use('/presupuestos', presupuestoRoutes);
 app.use('/recomendaciones', recomendacionRoutes);
-
+app.use('/perfil', usuarioRoutes);
 
 app.use((req, res) => {
   res.status(404).send('Página no encontrada');
