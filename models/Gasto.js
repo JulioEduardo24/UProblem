@@ -13,7 +13,8 @@ class Gasto {
         fecha: gastoData.fecha,
         categoria_sugerida: gastoData.categoria_sugerida,
         categoria_manual: gastoData.categoria_manual,
-        notas: gastoData.notas || null
+        notas: gastoData.notas || null,
+        tiempo_registro: gastoData.tiempo_registro || 0
       }])
       .select()
       .single();

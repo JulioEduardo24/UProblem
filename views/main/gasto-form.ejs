@@ -73,12 +73,15 @@
                 <% } %>
 
                     <form method="POST" action="<%= gasto ? `/gastos/editar/${gasto.id}` : '/gastos/nuevo' %>"
-                        class="gasto-form">
+                        class="gasto-form" id="gastoForm">
+                        
+                        <!-- Campo oculto para el cronómetro (en segundos) -->
+                        <input type="hidden" id="tiempoRegistro" name="tiempo_registro" value="0">
+                        
                         <div class="form-group">
                             <label for="descripcion">Descripción del Gasto *</label>
                             <input type="text" id="descripcion" name="descripcion" placeholder="Ej: Compra en Metro"
                                 value="<%= gasto ? gasto.descripcion : '' %>" required>
-                            <small>La IA sugerirá una categoría automáticamente</small>
                         </div>
 
                         <div class="categoria-sugerida" id="categoriaSugerida" style="display: none;">
@@ -87,7 +90,7 @@
                                     stroke-width="2">
                                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
                                 </svg>
-                                <span>Categoría sugerida por IA:</span>
+                                <span>Categoría sugerida:</span>
                             </div>
                             <div class="sugerencias-list" id="sugerenciasList"></div>
                         </div>
@@ -138,6 +141,7 @@
     <script src="/js/theme.js"></script>
     <script src="/js/categorizador.js"></script>
     <script src="/js/navbar.js"></script>
+    <script src="/js/cronometro.js"></script>
 </body>
 
 </html>

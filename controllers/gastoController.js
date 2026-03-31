@@ -58,7 +58,7 @@ exports.mostrarGastos = async (req, res) => {
       gastos,
       categorias,
       totalMensual,
-      categoria: categoria || '', // <-- ESTO ES LO IMPORTANTE
+      categoria: categoria || '',
       desde: desde || '',
       hasta: hasta || '',
       req
@@ -68,6 +68,7 @@ exports.mostrarGastos = async (req, res) => {
     res.status(500).send('Error al cargar los gastos');
   }
 };
+
 exports.mostrarFormularioNuevo = (req, res) => {
   const hoy = new Date().toISOString().split('T')[0];
   res.render('main/gasto-form', {
@@ -96,7 +97,16 @@ exports.sugerirCategoria = async (req, res) => {
 
 exports.crear = async (req, res) => {
   try {
-    const { descripcion, monto, categoria, fecha, notas, categoria_sugerida, categoria_manual_override } = req.body;
+    const { 
+      descripcion, 
+      monto, 
+      categoria, 
+      fecha, 
+      notas, 
+      categoria_sugerida, 
+      categoria_manual_override,
+      tiempo_registro
+    } = req.body;
 
     if (!descripcion || !monto || !categoria || !fecha) {
       return res.render('main/gasto-form', {
@@ -115,10 +125,12 @@ exports.crear = async (req, res) => {
         error: 'El monto debe ser mayor a 0'
       });
     }
-
-    // Determinar si fue manual o automático
     const esManual = categoria_manual_override === 'true';
+    const tiempoRegistroInt = tiempo_registro && parseInt(tiempo_registro) > 0 
+      ? parseInt(tiempo_registro) 
+      : null;
 
+    console.log(`Tiempo de registro recibido: ${tiempoRegistroInt}s (Manual: ${esManual})`);
     await Gasto.crear({
       usuario_id: req.userId,
       descripcion,
@@ -127,8 +139,12 @@ exports.crear = async (req, res) => {
       categoria_sugerida: categoria_sugerida || categoria,
       categoria_manual: esManual,
       fecha,
-      notas
+      notas,
+      tiempo_registro: tiempoRegistroInt
     });
+    if (tiempoRegistroInt) {
+      console.log(`Gasto creado con cronómetro - Tiempo: ${tiempoRegistroInt}s (${(tiempoRegistroInt/60).toFixed(1)}min)`);
+    }
 
     res.redirect('/gastos?success=created');
   } catch (error) {
@@ -164,7 +180,14 @@ exports.mostrarFormularioEditar = async (req, res) => {
 
 exports.actualizar = async (req, res) => {
   try {
-    const { descripcion, monto, categoria, fecha, notas } = req.body;
+    const { 
+      descripcion, 
+      monto, 
+      categoria, 
+      fecha, 
+      notas,
+      tiempo_registro  // ← NUEVO CAMPO
+    } = req.body;
 
     if (!descripcion || !monto || !categoria || !fecha) {
       const gasto = await Gasto.obtenerPorId(req.params.id, req.userId);
@@ -176,14 +199,22 @@ exports.actualizar = async (req, res) => {
       });
     }
 
+    const tiempoRegistroInt = tiempo_registro && parseInt(tiempo_registro) > 0 
+      ? parseInt(tiempo_registro) 
+      : null;
     await Gasto.actualizar(req.params.id, req.userId, {
       descripcion,
       monto: parseFloat(monto),
       categoria,
       fecha,
       notas,
-      categoria_manual: true
+      categoria_manual: true,
+      tiempo_registro: tiempoRegistroInt 
     });
+
+    if (tiempoRegistroInt) {
+      console.log(`Gasto actualizado - ID: ${req.params.id}, Tiempo: ${tiempoRegistroInt}s`);
+    }
 
     res.redirect('/gastos?success=updated');
   } catch (error) {
