@@ -11,7 +11,7 @@ exports.showRegister = (req, res) => {
 
 exports.showLogin = (req, res) => {
   const registered = req.query.registered === 'true';
-  res.render('auth/login', { 
+  res.render('auth/login', {
     error: null,
     success: registered ? 'Cuenta creada exitosamente. Inicia sesión.' : null
   });
@@ -19,62 +19,62 @@ exports.showLogin = (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { 
-      nombres, apellidos, fecha_nacimiento, sexo, usuario, correo, 
-      password, confirmPassword, tipo_documento, numero_documento, telefono 
+    const {
+      nombres, apellidos, fecha_nacimiento, sexo, usuario, correo,
+      password, confirmPassword, tipo_documento, numero_documento, telefono
     } = req.body;
 
-    if (!nombres || !apellidos || !fecha_nacimiento || !sexo || !usuario || 
-        !correo || !password || !tipo_documento || !numero_documento) {
-      return res.render('auth/register', { 
-        error: 'Todos los campos obligatorios deben completarse' 
+    if (!nombres || !apellidos || !fecha_nacimiento || !sexo || !usuario ||
+      !correo || !password || !tipo_documento || !numero_documento) {
+      return res.render('auth/register', {
+        error: 'Todos los campos obligatorios deben completarse'
       });
     }
 
     if (password !== confirmPassword) {
-      return res.render('auth/register', { 
-        error: 'Las contraseñas no coinciden' 
+      return res.render('auth/register', {
+        error: 'Las contraseñas no coinciden'
       });
     }
 
     if (password.length < 8) {
-      return res.render('auth/register', { 
-        error: 'La contraseña debe tener al menos 8 caracteres' 
+      return res.render('auth/register', {
+        error: 'La contraseña debe tener al menos 8 caracteres'
       });
     }
 
     if (usuario.length < 4) {
-      return res.render('auth/register', { 
-        error: 'El usuario debe tener al menos 4 caracteres' 
+      return res.render('auth/register', {
+        error: 'El usuario debe tener al menos 4 caracteres'
       });
     }
 
     const fechaNac = new Date(fecha_nacimiento);
     const edad = Math.floor((new Date() - fechaNac) / (365.25 * 24 * 60 * 60 * 1000));
     if (edad < 18) {
-      return res.render('auth/register', { 
-        error: 'Debes ser mayor de 18 años' 
+      return res.render('auth/register', {
+        error: 'Debes ser mayor de 18 años'
       });
     }
 
     const existingEmail = await Auth.findByEmail(correo);
     if (existingEmail) {
-      return res.render('auth/register', { 
-        error: 'El correo ya está registrado' 
+      return res.render('auth/register', {
+        error: 'El correo ya está registrado'
       });
     }
 
     const existingUsername = await Auth.findByUsername(usuario);
     if (existingUsername) {
-      return res.render('auth/register', { 
-        error: 'El nombre de usuario ya está en uso' 
+      return res.render('auth/register', {
+        error: 'El nombre de usuario ya está en uso'
       });
     }
 
     const existingDocument = await Auth.findByDocument(numero_documento);
     if (existingDocument) {
-      return res.render('auth/register', { 
-        error: 'El número de documento ya está registrado' 
+      return res.render('auth/register', {
+        error: 'El número de documento ya está registrado'
       });
     }
 
@@ -87,8 +87,8 @@ exports.register = async (req, res) => {
 
   } catch (error) {
     console.error('Error en registro:', error);
-    res.render('auth/register', { 
-      error: 'Error al crear la cuenta. Intenta nuevamente.' 
+    res.render('auth/register', {
+      error: 'Error al crear la cuenta. Intenta nuevamente.'
     });
   }
 };
@@ -98,15 +98,16 @@ exports.login = async (req, res) => {
     const { identifier, password } = req.body;
 
     if (!identifier || !password) {
-      return res.render('auth/login', { 
+      return res.render('auth/login', {
         error: 'Usuario/Correo y contraseña son obligatorios',
         success: null
       });
     }
 
     const user = await Auth.findByEmailOrUsername(identifier);
+    //console.log(user);
     if (!user) {
-      return res.render('auth/login', { 
+      return res.render('auth/login', {
         error: 'Credenciales incorrectas',
         success: null
       });
@@ -114,22 +115,23 @@ exports.login = async (req, res) => {
 
     const isValidPassword = await Auth.verifyPassword(password, user.password);
     if (!isValidPassword) {
-      return res.render('auth/login', { 
+      return res.render('auth/login', {
         error: 'Credenciales incorrectas',
         success: null
       });
     }
 
     const token = jwt.sign(
-      { 
+      {
         userId: user.id,
         nombres: user.nombres,
-        apellidos: user.apellidos
+        apellidos: user.apellidos,
+        rol: user.rol
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
-
+    //console.log('Rol', user.rol);
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -140,11 +142,25 @@ exports.login = async (req, res) => {
       maxAge: 365 * 24 * 60 * 60 * 1000
     });
 
-    res.redirect('/dashboard');
+    res.cookie('rol', user.rol || '1', {
+      maxAge: 365 * 24 * 60 * 60 * 1000
+    });
+
+    // Redirigir según el rol del usuario
+    if (user.rol === 2) {
+      return res.redirect('/administrator');
+    } else if (user.rol === 1) {
+      return res.redirect('/dashboard');
+    } else {
+      return res.render('auth/login', {
+        error: 'Usuario sin rol asignado. Contacta al administrador.',
+        success: null
+      });
+    }
 
   } catch (error) {
     console.error('Error en login:', error);
-    res.render('auth/login', { 
+    res.render('auth/login', {
       error: 'Error al iniciar sesión. Intenta nuevamente.',
       success: null
     });
@@ -159,7 +175,7 @@ exports.logout = (req, res) => {
 exports.showDashboard = async (req, res) => {
   try {
     const user = await Auth.findById(req.userId);
-    
+
     // Obtener fecha actual
     const hoy = new Date();
     const mes = hoy.getMonth() + 1;
@@ -173,7 +189,7 @@ exports.showDashboard = async (req, res) => {
 
     // Obtener presupuesto actual
     const presupuestoActual = await Presupuesto.obtenerActual(req.userId, mes, anio);
-    
+
     let progresoPresupuesto = null;
     if (presupuestoActual) {
       progresoPresupuesto = await Presupuesto.calcularProgreso(req.userId, mes, anio);
@@ -216,20 +232,31 @@ exports.showDashboard = async (req, res) => {
     res.redirect('/auth/login');
   }
 };
+exports.showAdministradorPanel = async (req, res) => {
+  try {
+    const user = await Auth.findById(req.userId);
+    res.render('main/administrator', {
+      user
+    });
+  } catch (error) {
+    console.error('Error al cargar administrator panel:', error);
+    res.redirect('/auth/login');
+  }
+};
 
 function obtenerCategoriaConMasGasto(resumen) {
   if (Object.keys(resumen).length === 0) return 'N/A';
-  
+
   let maxCategoria = '';
   let maxMonto = 0;
-  
+
   Object.entries(resumen).forEach(([categoria, monto]) => {
     if (monto > maxMonto) {
       maxMonto = monto;
       maxCategoria = categoria;
     }
   });
-  
+
   return maxCategoria;
 }
 
@@ -244,13 +271,13 @@ function obtenerColoresCategorias(categorias) {
     'Ropa y Cuidado Personal': '#f43f5e',
     'Otros': '#6b7280'
   };
-  
+
   return categorias.map(cat => coloresMap[cat] || '#6b7280');
 }
 exports.showDashboard = async (req, res) => {
   try {
     const user = await Auth.findById(req.userId);
-    
+
     // Obtener fecha actual
     const hoy = new Date();
     const mes = hoy.getMonth() + 1;
@@ -264,7 +291,7 @@ exports.showDashboard = async (req, res) => {
 
     // Obtener presupuesto actual
     const presupuestoActual = await Presupuesto.obtenerActual(req.userId, mes, anio);
-    
+
     let progresoPresupuesto = null;
     if (presupuestoActual) {
       progresoPresupuesto = await Presupuesto.calcularProgreso(req.userId, mes, anio);
@@ -276,7 +303,7 @@ exports.showDashboard = async (req, res) => {
 
     // Obtener recomendaciones
     const recomendaciones = await Recomendacion.generarRecomendaciones(req.userId, mes, anio);
-    const recomendacionesImportantes = recomendaciones.filter(r => 
+    const recomendacionesImportantes = recomendaciones.filter(r =>
       r.prioridad === 'critico' || r.prioridad === 'alto'
     );
 
