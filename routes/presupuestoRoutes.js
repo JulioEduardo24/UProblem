@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const presupuestoController = require('../controllers/presupuestoController');
-const { authMiddleware } = require('../middleware/authMiddleware');
+const { authMiddleware, isAdmin, isUser } = require('../middleware/authMiddleware');
 
 router.use(authMiddleware);
 
-router.get('/', presupuestoController.mostrarPresupuestos);
-router.get('/nuevo', presupuestoController.mostrarFormularioNuevo);
-router.post('/nuevo', presupuestoController.crear);
-router.get('/editar/:id', presupuestoController.mostrarFormularioEditar);
-router.post('/editar/:id', presupuestoController.actualizar);
-router.post('/eliminar/:id', presupuestoController.eliminar);
+router.get('/', isUser, presupuestoController.mostrarPresupuestos);
+router.get('/nuevo', isUser, presupuestoController.mostrarFormularioNuevo);
+router.post('/nuevo', isUser, presupuestoController.crear);
+router.get('/editar/:id', isUser, presupuestoController.mostrarFormularioEditar);
+router.post('/editar/:id', isUser, presupuestoController.actualizar);
+router.post('/eliminar/:id', isUser, presupuestoController.eliminar);
 
 module.exports = router;

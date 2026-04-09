@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
-const { authMiddleware } = require('../middleware/authMiddleware');
+const { authMiddleware, isAdmin, isUser } = require('../middleware/authMiddleware');
 
 router.use(authMiddleware);
 

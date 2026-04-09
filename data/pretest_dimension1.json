@@ -1,0 +1,196 @@
+{
+  "metadata": {
+    "dimension": "Dimensión 1: Eficiencia Temporal",
+    "fase": "PRE-TEST",
+    "metodo": "Manual",
+    "fecha_evaluacion": "2026-03-31",
+    "descripcion": "Tiempo de registro de gastos por método manual",
+    "total_participantes": 25,
+    "transacciones_por_participante": 20
+  },
+  "participantes": [
+    {
+      "id": 1,
+      "nombre": "Yadira Contreras",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 320,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 16
+    },
+    {
+      "id": 2,
+      "nombre": "Milagros Santa Cruz",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 360,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 18
+    },
+    {
+      "id": 3,
+      "nombre": "Marisol Aquise",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 280,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 14
+    },
+    {
+      "id": 4,
+      "nombre": "Luis Calla",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 400,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 20
+    },
+    {
+      "id": 5,
+      "nombre": "Miriam Moran",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 340,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 17
+    },
+    {
+      "id": 6,
+      "nombre": "Carlos Aquise",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 300,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 15
+    },
+    {
+      "id": 7,
+      "nombre": "Paulo Colona",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 420,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 21
+    },
+    {
+      "id": 8,
+      "nombre": "Fabricio Godoy",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 260,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 13
+    },
+    {
+      "id": 9,
+      "nombre": "Cesar Calla",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 380,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 19
+    },
+    {
+      "id": 10,
+      "nombre": "David Rodriguez",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 440,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 22
+    },
+    {
+      "id": 11,
+      "nombre": "Tadeo Medina",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 240,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 12
+    },
+    {
+      "id": 12,
+      "nombre": "Juan Carlos Aquise",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 360,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 18
+    },
+    {
+      "id": 13,
+      "nombre": "Gabriel Legaspi",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 300,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 15
+    },
+    {
+      "id": 14,
+      "nombre": "Ana Aquise",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 280,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 14
+    },
+    {
+      "id": 15,
+      "nombre": "Jesus Camacho",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 400,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 20
+    },
+    {
+      "id": 16,
+      "nombre": "Jan Paul Carranza",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 340,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 17
+    },
+    {
+      "id": 17,
+      "nombre": "Angel Rubio",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 260,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 13
+    },
+    {
+      "id": 18,
+      "nombre": "Angelo Briceño",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 380,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 19
+    },
+    {
+      "id": 19,
+      "nombre": "Pabel Vila",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 320,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 16
+    },
+    {
+      "id": 20,
+      "nombre": "Danna Vila",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 360,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 18
+    },
+    {
+      "id": 21,
+      "nombre": "Yasmin Quiroz",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 300,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 15
+    },
+    {
+      "id": 22,
+      "nombre": "Yeremi Miya",
+      "fecha": "2026-03-31",
+      "tiempo_total_segundos": 300,
+      "numero_transacciones": 20,
+      "tiempo_promedio_segundos": 15
+    }
+  ],
+  "estadisticas": {
+    "tiempo_total_promedio": 336.19,
+    "tiempo_por_transaccion_promedio": 16.81,
+    "tiempo_minimo": 240,
+    "tiempo_maximo": 440,
+    "desviacion_estandar": 52.87
+  }
+}

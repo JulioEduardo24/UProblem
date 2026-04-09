@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const gastoController = require('../controllers/gastoController');
-const { authMiddleware } = require('../middleware/authMiddleware');
+const { authMiddleware, isAdmin, isUser } = require('../middleware/authMiddleware');
 
 router.use(authMiddleware);
 
-router.get('/', gastoController.mostrarGastos);
-router.get('/nuevo', gastoController.mostrarFormularioNuevo);
-router.post('/nuevo', gastoController.crear);
-router.post('/sugerir-categoria', gastoController.sugerirCategoria);
-router.get('/editar/:id', gastoController.mostrarFormularioEditar);
-router.post('/editar/:id', gastoController.actualizar);
-router.post('/eliminar/:id', gastoController.eliminar);
+router.get('/', isUser, gastoController.mostrarGastos);
+router.get('/nuevo', isUser, gastoController.mostrarFormularioNuevo);
+router.post('/nuevo', isUser, gastoController.crear);
+router.post('/sugerir-categoria', isUser, gastoController.sugerirCategoria);
+router.get('/editar/:id', isUser, gastoController.mostrarFormularioEditar);
+router.post('/editar/:id', isUser, gastoController.actualizar);
+router.post('/eliminar/:id', isUser, gastoController.eliminar);
 
-router.get('/exportar/pdf', gastoController.exportarPDF);
-router.get('/exportar/excel', gastoController.exportarExcel);
+router.get('/exportar/pdf', isUser, gastoController.exportarPDF);
+router.get('/exportar/excel', isUser, gastoController.exportarExcel);
 
 
 module.exports = router;

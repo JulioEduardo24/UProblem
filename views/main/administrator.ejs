@@ -25,8 +25,8 @@
                 </button>
             </div>
             <div class="nav-menu" id="navMenu">
-                <a href="/recomendaciones" class="nav-link">Evaluados</a>
-                <a href="/perfil" class="nav-link">Perfil</a>
+                <a href="/" class="nav-link active">Inicio</a>
+                <a href="/evaluados" class="nav-link">Evaluados</a>
                 <button id="themeToggle" class="btn-icon" title="Cambiar tema">
                     <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -47,6 +47,11 @@
             </div>
         </div>
     </nav>
+    <div class="container">
+        <div class="dashboard-welcome">
+            <h2>Bienvenido, <%= user.nombres %></h2>
+        </div>
+    </div>
     <script src="/js/theme.js"></script>
     <script src="/js/navbar.js"></script>
 </body>
